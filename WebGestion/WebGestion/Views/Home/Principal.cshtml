@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "Principal";
+}
+<script></script>
+<div class="jumbotron">
+    <h1>Gesem</h1>
+    <p class="lead">Gesem es una aplicación para simplificar la Gestión&nbsp;Empresarial.</p>
+    <p><a href="http://www.ibarraventanas.com" class="btn btn-primary btn-lg">Ibarra Ventanas &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div>
+        <!-- class="col-md-4" -->
+        <h2>Comenzando</h2>
+        <p>
+            Seleccione uno de los enlaces del menú para acceder a:
+        </p>
+
+        <ul>
+            <li>@Html.ActionLink("Artículos", "Index", "Articulos").- Artículos, Familias, Impuestos.</li>
+            <li>Clientes.- Clientes, Presupuestos, Pedidos, Facturas.</li>
+            <li>Proveedores.- Proveedores, Pedidos, Facturas.</li>
+            <li>Empresa.- Locales, Empleados, Cargos, Permisos.</li>
+            <li>Mantenimiento.- Formas de entrega, Formas de pago, Municipios, Provincias, Países,...</li>
+        </ul>
+
+    </div>
+    @if (Request.IsAuthenticated)
+    {
+        <Ul Class="SubMenuItem">
+            <li> this menu item is for IsAuthenticated</li>
+        </Ul>
+        if (User.IsInRole("Admin"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for 'Admin' role</li>
+            </Ul>
+        }
+        if (User.IsInRole("admin"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for h  'Admin' role</li>
+            </Ul>
+        }
+        if (HttpContext.Current.User.IsInRole("Admin"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for hhh 'Admin' role</li>
+            </Ul>
+        }
+        if (User.IsInRole("Crear Pedidos"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for 'Crear Pedidos' role</li>
+            </Ul>
+        }
+        if (Roles.IsUserInRole("Administrator"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for 'Administrator' role</li>
+            </Ul>
+        }
+        if (Roles.IsUserInRole("Admin"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for 'Admin' role</li>
+            </Ul>
+        }
+        if (Roles.IsUserInRole(User.Identity.Name, "Admin"))
+        {
+            <Ul Class="SubMenuItem">
+
+                <li> this menu item is for 'Admin' role</li>
+            </Ul>
+        }
+    }
+    else
+    {
+        <Ul Class="SubMenuItem">
+            <li> this menu item is for Unknown user</li>
+        </Ul>
+    }
+</div>
+<p>
+
+

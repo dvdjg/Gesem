@@ -1,0 +1,41 @@
+﻿{
+  "processing": "Procesando...",
+  "search": "Empieza por:",
+  "lengthMenu": "Mostrar _MENU_ registros.",
+  "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros.",
+  "infoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros.",
+  "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+  "infoPostFix": "",
+  "loadingRecords": "Cargando...",
+  "zeroRecords": "No se encontraron resultados.",
+  "emptyTable": "Ningún dato disponible en esta tabla.",
+  "paginate": {
+    "first": "Primero",
+    "last": "Último",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  },
+  "aria": {
+    "sortAscending": ": Activar para ordenar la columna de manera ascendente.",
+    "sortDescending": ": Activar para ordenar la columna de manera descendente."
+  },
+  "buttons": {
+    "print": "Impresora",
+    "copyHtml5": "Portapapeles",
+    "copy": "Portapapeles",
+    "colvis": "Cambiar columnas",
+    "copyTitle": "Copiar al portapapeles",
+    "copyKeys": "Presionar <i>ctrl</i> + <i>C</i> (o <i>\u2318</i> + <i>C</i>) para copiar la tabla al portapapeles de su sistema. <br><br>Para cancelar, cliquee este mensaje o presione escape.",
+    "selectAll":  "Seleccionar Todo",
+    "selectNone": "Desseleccionar Todo"
+  },
+  "select": {
+    "rows": {
+      "_": "Ha seleccionado %d filas.",
+      "0": "Click en en la casilla de la izquierda para seleccionar la fila.",
+      "1": "Ha seleccionado una fila."
+    }
+  },
+  "decimal": ",",
+  "thousands": "."
+}

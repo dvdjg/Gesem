@@ -1,0 +1,41 @@
+﻿@model IEnumerable<WebGestion.Models.TiposFacturas>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+</style>
+<h2>Index</h2>
+<h4>TiposFacturas</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Prefijo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Descripcion)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Prefijo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Descripcion)
+        </td>
+
+    </tr>
+}
+
+</table>

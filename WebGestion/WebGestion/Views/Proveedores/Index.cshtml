@@ -1,0 +1,78 @@
+﻿@model IEnumerable<WebGestion.Models.Proveedores>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+</style>
+<h2>Index</h2>
+<h4>Proveedores</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.TelefonoFAX)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CuentaBancaria)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Contacto)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Web)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FechaAlta)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FechaBaja)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Estados.Nombre)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Personas.Nombre)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TelefonoFAX)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CuentaBancaria)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Contacto)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Web)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FechaAlta)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FechaBaja)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Estados.Nombre)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Personas.Nombre)
+        </td>
+
+    </tr>
+}
+
+</table>

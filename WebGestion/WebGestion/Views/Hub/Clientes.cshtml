@@ -1,0 +1,16 @@
+﻿<div class="Clientes">
+    <h2>Clientes</h2>
+    <div class="datatable"></div>
+</div>
+<script type="text/javascript">
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var connectCount = 0;
+    $(function () { //shorthand document.ready function
+        var vm = getViewModel("Clientes");//
+        // Si no se tiene datatable, llamada para coger records: vm.requestRecordData(0, 200, null, false);
+        vm.initDatatable($('div.Clientes div.datatable'), { filteredRecords: [], queryToken: "" });
+    });
+
+</script>

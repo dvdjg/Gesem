@@ -1,0 +1,48 @@
+﻿@model IEnumerable<WebGestion.Models.AspNetUserClaims>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+</style>
+<h2>Index</h2>
+<h4>AspNetUserClaims</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClaimType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClaimValue)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AspNetUsers.Email)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClaimType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClaimValue)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AspNetUsers.Email)
+        </td>
+
+    </tr>
+}
+
+</table>

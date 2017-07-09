@@ -1,0 +1,55 @@
+﻿@model IEnumerable<WebGestion.Models.PresupuestosClientesDetalleAgrupados>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+</style>
+<h2>Index</h2>
+<h4>PresupuestosClientesDetalleAgrupados</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Descripcion)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Detalle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cantidad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PresupuestosClientes.CodPresupuesto)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Descripcion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Detalle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Cantidad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PresupuestosClientes.CodPresupuesto)
+        </td>
+
+    </tr>
+}
+
+</table>

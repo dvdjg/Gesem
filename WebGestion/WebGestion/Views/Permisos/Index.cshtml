@@ -1,0 +1,273 @@
+﻿@*@model IEnumerable<WebGestion.Models.Permisos>*@
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="page-header">
+    <h2>Permisos <small>de Usuarios del Sistema</small></h2>
+</div>
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li class="active">Permisos</li>
+</ol>
+
+<div id="wrap_datatab">
+    <table class="table display dt-responsive compact " id="datatab"
+           border="0" cellspacing="0" style="padding-left:0px;">
+        <!-- table-striped table-hover table-bordered nowrap-->
+        <thead>
+            <tr>
+                <th><!-- Selección --></th>
+                <th class="all">
+                    <!-- Mostrar siempre -->
+                    Id
+                </th>
+                <th class="all">
+                    Permiso
+                </th>
+                <th>
+                    Alta → Baja
+                </th>
+                <th>
+                    Nombre
+                </th>
+                <th><!-- Muestra el resto de elementos de la fila --></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        @*<tfoot><tr/></tfoot>*@
+    </table>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        function ToJavaScriptDate(data) {
+            if (data == null)
+                return "∞";
+            var dt = new Date(parseFloat(data.substr(6)));
+            var iso = dt.toISOString();
+            return iso.slice(0, 19).replace(/T/g, ' <small>') + '</small>';
+        }
+
+        $(document).ready(function () {
+
+            var calcDataTableHeight = function () {
+                var top = $('#wrap_datatab').offset().top;
+                var height = $(window).height() - top - 105;
+                //lbl1.textContent = "$(window).height() = " + $(window).height();
+                //lbl2.textContent = "$('#wrap_datatab').offset().top = " + top;
+                return height;
+            };
+
+            var oTable = $('#datatab').DataTable({
+                responsive: {
+                    details: {
+                        type: 'column',
+                        target: -1
+                    }
+                },
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    type: "POST",
+                    url: '/Permisos/DataHandler',
+                    contentType: 'application/json; charset=utf-8',
+                    data: function (data) { return data = JSON.stringify(data); }
+                },
+                dom: 'BfrtiS',
+                fixedHeader: true,
+                scrollY: calcDataTableHeight(), // '40vh'
+                scrollX: false,
+                scroller: true,
+                // no funciona scrollCollapse : true,
+                deferRender: true,
+                paging: true,
+                rowId: 'Id',
+                columns: [
+                    { data: null, width: "1%", defaultContent: '' }, // { width: "1%", orderable: false },
+                    { data: "Id", width: "1%", className: "dt-right" },
+                    {
+                        data: "Permiso", width: "20%",
+                        render: function (data, type, full) { return '<a href="/Permisos/Edit/' + full['Id'] + '">' + data + '</a>' + ' <br/> <small>' + full['Descripcion'] + '</small>' }
+                    },
+                    {
+                        data: "FechaAlta", width: "10%",
+                        render: function (data, type, full) { return ToJavaScriptDate(full['FechaAlta']) + (full['FechaBaja'] == null ? "" : '<br/>' + ToJavaScriptDate(full['FechaBaja'])); }
+                    },
+                    { data: "Nombre", width: "10%" },
+                    { data: null, width: "1%", orderable: false, defaultContent: '' },
+                ],
+                order: [[1, "asc"], [2, "asc"], [3, "asc"], [4, "asc"]],
+                columnDefs: [{
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets: 0
+                },
+                    { className: 'control', orderable: false, targets: -1 }
+                ],
+                select: {
+                    style: "@(MvcApplication.isMobileBrowser ? "multi" : "os")", // "single"
+                    selector: 'td:first-child'
+                },
+                language: {
+                    "url": "@Url.Content("~/Scripts/Datatables.ES_es.json")"
+                },
+                colReorder: true,
+                buttons: [
+                            {
+                                text: '<span title="Añadir Registro"><i class="glyphicon glyphicon-plus"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Crear</span></span></span></span>',
+                                action: function () {
+                                    window.location.href = "@Url.Action("Create", "Permisos")";
+                                }
+                            },
+                        {
+                            extend: 'colvis',
+                            text: '<span title="Visivilidad de las columnas"><i class="fa fa-columns"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Columnas</span></span></span></span>'
+                        },
+                            {
+                                text: '<span title="Recargar Tabla"><i class="fa fa-refresh"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Recargar</span></span></span></span>',
+                                action: function () {
+                                    oTable.ajax.reload();
+                                }
+
+                            },
+                {
+                    extend: 'selectAll',
+                    text: '<span title="Seleccionar Todo"><i class="fa fa-list-ul"></i> <span class="hidden-sm"><span class="hidden-xs">Todo</span></span></span>'
+                },
+                {
+                    extend: 'selectNone',
+                    text: '<span title="Deseleccionar Todo"><i class="fa fa-bars"></i> <span class="hidden-sm"><span class="hidden-xs">Nada</span></span></span>'
+                },
+                {
+                    extend: 'selected',
+                    text: '<span title="Borrar Seleccionados"><i class="glyphicon glyphicon-erase"></i> <span class="hidden-sm"><span class="hidden-xs" id="btnBorrarTxt">Borrar</span></span></span>',
+                    action: function (e, dt, node, config) {
+                        var list = $('.selected-list');
+                        var idArray = new Array();
+                        list.empty();
+                        var i = 0;
+                        oTable.rows('.selected').every(function (rowIdx, tableLoop, rowLoop) {
+                            var data = this.data();
+                            idArray.push(data.Id);
+                            ++i;
+                            list.append('<li>' + data.Permiso + '</li>');
+                        });
+                        $('#formAction').attr("action", "@Url.Action("DeleteList", "Permisos" )" + "?" + $.param({ "ids": idArray }, true));
+                        $(".txtConfirmModalAccion").text("Borrar");
+                        $('#myConfirmModal').modal('show'); // data-toggle="modal" data-target="#myConfirmModal"
+                    }
+                },
+                {
+                    extend: 'selected',
+                    text: '<span title="Clonar Seleccionados"><i class="glyphicon glyphicon-erase"></i> <span class="hidden-sm"><span class="hidden-xs" id="btnClonarTxt">Clonar</span></span></span>',
+                    action: function (e, dt, node, config) {
+                        var list = $('.selected-list');
+                        var idArray = new Array();
+                        list.empty();
+                        var i = 0;
+                        oTable.rows('.selected').every(function (rowIdx, tableLoop, rowLoop) {
+                            var data = this.data();
+                            idArray.push(data.Id);
+                            ++i;
+                            list.append('<li>' + data.Permiso + '</li>');
+                        });
+                        $('#formAction').attr("action", "@Url.Action("CloneList", "Permisos" )" + "?" + $.param({ "ids": idArray }, true));
+                        $(".txtConfirmModalAccion").text("Clonar");
+                        $('#myConfirmModal').modal('show');
+                    }
+                },
+                     {
+                         extend: 'collection',
+                         text: '<span title="Exportar Todo"><i class="glyphicon glyphicon-export"></i> <span class="hidden-xs">Exportar</span></span>',
+                         buttons: [
+                              {
+                                  extend: 'print',
+                                  text: '<span title="Imprimir tabla"><i class="fa fa-print"></i> Imprimir</span>',
+                                  customize: function (win) {
+                                      $(win.document.body)
+                                          .css('font-size', '10pt')
+                                          .prepend(
+                                              '<img src="@Url.Content("~/Content/images/logo.png")" style="position:absolute; top:0; left:0;opacity: 0.3;filter: alpha(opacity=30);" />'
+                                          );
+
+                                      $(win.document.body).find('table')
+                                          .addClass('compact')
+                                          .css('font-size', 'inherit');
+                                  },
+                                  exportOptions: {
+                                      modifier: {
+                                          selected: true
+                                      }
+                                  },
+                                  message: 'Impresión de la tabla de Permisos'
+                              },
+                            {
+                                extend: 'copyHtml5',
+                                text: '<span title="Copia al Portapapeles"><i class="glyphicon glyphicon-paperclip"></i> Portapapeles</span>'
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<span title="Microsoft Excel"><i class="fa fa-file-excel-o"></i> Excel</span>'
+                            },
+                            {
+                                extend: 'csvHtml5',
+                                text: '<span title="Comma Separated Values"><i class="fa fa-file-text-o"></i> CSV</span>'
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<span title="Portable Document Format"><i class="fa fa-file-pdf-o"></i> PDF</span>'
+                            }
+                         ]
+                     }
+                ]
+                //, stateSave: true,
+                //stateDuration: -1
+            });
+
+            var fnDelete = function () {
+                var nSelect = oTable.rows('.selected').data().length;
+                var nText = (nSelect > 0) ? " (" + nSelect + ")" : "";
+                // Actualizar el texto del botón de borrar registros
+                $('#btnBorrarTxt').text('Borrar' + nText);
+                $('#btnClonarTxt').text('Clonar' + nText);
+            };
+            // Detectar cambios en las filas seleccionadas
+            oTable
+                .on('select', function (e, dt, type, indexes) {
+                    fnDelete();
+                })
+                .on('deselect', function (e, dt, type, indexes) {
+                    fnDelete();
+                });
+            //oTable.columns().every(function () {
+            //    this.width = this.width * 0.6;
+            //});
+            //oTable.columns().adjust().draw();
+            //$('#datatab thead th').each(function () {
+            //    $('#datatab tfoot tr').append('<th><input type="text" /></th>');
+            //});
+            //oTable.columns().every(function () {
+            //    var that = this;
+
+            //    $('input', this.footer()).on('keyup change', function () {
+            //        var val = this.value;
+            //        that.search(val).draw();
+            //    });
+            //});
+            var update_size = function () {
+                $('#datatab').dataTable()._fnScrollDraw();
+                $('#datatab').closest(".dataTables_scrollBody").height(calcDataTableHeight());
+            }
+
+            $(window).resize(function () {
+                // No actualiza la tabla mientras que sigan habiendo eventos de redimensión
+                clearTimeout(window.refresh_size);
+                window.refresh_size = setTimeout(function () { update_size(); }, 150);
+            });
+        });
+
+
+    </script>
+}

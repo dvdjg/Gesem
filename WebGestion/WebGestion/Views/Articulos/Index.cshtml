@@ -1,0 +1,81 @@
+﻿@model IEnumerable<WebGestion.Models.Articulos>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+
+
+</style>
+<h2>Index</h2>
+<h4>Articulos</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.CodArticulo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Articulo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Precio)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PrecioBase)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Descuento)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Estados.Nombre)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Familias.CodFamilia)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IVAs.Descripcion)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CodArticulo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Articulo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Precio)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PrecioBase)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Descuento)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Estados.Nombre)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Familias.CodFamilia)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IVAs.Descripcion)
+        </td>
+
+    </tr>
+}
+
+</table>

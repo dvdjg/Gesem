@@ -1,0 +1,70 @@
+﻿@model IEnumerable<WebGestion.Models.PedidosClientes>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+
+
+
+</style>
+<h2>Index</h2>
+<h4>PedidosClientes</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.CodPedido)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AspNetUsers.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Estados.Nombre)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FormasEntrega.FormaEntrega)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FormasPago.FormaPago)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PresupuestosClientes.CodPresupuesto)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CodPedido)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AspNetUsers.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Estados.Nombre)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FormasEntrega.FormaEntrega)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FormasPago.FormaPago)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PresupuestosClientes.CodPresupuesto)
+        </td>
+
+    </tr>
+}
+
+</table>

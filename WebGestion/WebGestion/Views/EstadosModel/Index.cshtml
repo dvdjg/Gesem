@@ -1,0 +1,208 @@
+﻿
+@using PerpetuumSoft.Knockout
+
+@model WebGestion.Models.EstadosModel
+@{
+    var ko = Html.CreateKnockoutContext();
+}
+@{
+    ViewBag.Title = "EstadosModel";
+}
+
+<h2>Estados</h2>
+
+@using (ko.Html.Form("AddItem", "EstadosModel", null, new { Id = "myform" }))
+{
+    using (var itemToAdd = ko.With(m => m.ItemToAdd))
+    {
+        <span>Id:</span> @itemToAdd.Html.Span(m => m.Id)
+        <span>Nombre:</span> @itemToAdd.Html.TextBox(m => m.Nombre).ValueUpdate(KnockoutValueUpdateKind.AfterKeyDown)
+        <span>Descripción:</span> @itemToAdd.Html.TextBox(m => m.Desc).ValueUpdate(KnockoutValueUpdateKind.AfterKeyDown)
+        <button type="submit" @itemToAdd.Bind.Enable(m => m.Nombre.Length > 0)>Add</button>
+    }
+    <p>Items:</p>
+    @ko.Html.ListBox(m => m.Items, new { width = 350, size = 7 }, item => "[" + item.Id + "] " + item.Nombre)
+}
+
+<textarea id="textArea">Área</textarea>
+
+<label><input type="checkbox" data-class="fancytree-colorize-selected"> fancytree-colorize-selected</label>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <b>Estados</b>
+    </div>
+    <div id="tree">
+    </div>
+    <div class="panel-footer">
+        <button id="btnExpandAll" class="btn btn-xs btn-primary">Expande todo</button>
+        <button id="btnCollapseAll" class="btn btn-xs btn-warning">Contrae todo</button>
+    </div>
+</div>
+
+@*<div data-bind="fancytree: {}">
+    <ul style="display:none" data-bind="template: { name: 'itemTmpl', foreach: Items }"></ul>
+</div>*@
+<script id="itemTmpl" type="text/html">
+    <li>
+        <span data-bind="text: Nombre, attr: { title: Desc ? Desc : Nombre, class: children ? 'folder' : '' }"></span>
+        <ul data-bind="template: { name: 'itemTmpl', foreach: children }"></ul>
+    </li>
+</script>
+<script>
+
+    function convertItemsToList(childList) {
+        var parent, nodeMap = {};
+
+        //if (childList.kind === "tasks#tasks") {
+        //    childList = childList.items;
+        //}
+        // Pass 1: store all tasks in reference map
+        $.each(childList, function (i, c) {
+            nodeMap[c.Id] = c;
+        });
+        // Pass 2: adjust fields and fix child structure
+        childList = $.map(childList, function (c) {
+            // Rename 'key' to 'Id'
+            //c.children = []; // Que siempre haya un campo children para la expansión del template "itemTmpl"
+            c.key = c.Id;
+            c.title = c.Nombre;
+            c.tooltip = c.Desc;
+            //c.folder = false;
+            delete c.Id;
+            delete c.Nombre;
+            //delete c.Desc;
+            // Set checkbox for completed tasks
+            ///c.selected = (c.status === "completed");
+            if (c.PadreId == c.key)
+                c.PadreId = 0;
+
+            // Check if c is a child node
+            if (c.PadreId) {
+                // add c to `children` array of parent node
+                parent = nodeMap[c.PadreId];
+                parent.folder = true;
+                if (parent.children) {
+                    parent.children.push(c);
+                } else {
+                    parent.children = [c];
+                }
+                return null;  // Remove c from childList
+            }
+            return c;  // Keep top-level nodes
+        });
+        // Pass 3: sort chldren by 'position'
+        $.each(childList, function (i, c) {
+            if (c.children && c.children.length > 1) {
+                c.children.sort(function (a, b) {
+                    ///return ((a.position < b.position) ? -1 : ((a.position > b.position) ? 1 : 0));
+                    return a.title.localeCompare(b.title);
+                });
+            }
+        });
+        return childList;
+    }
+
+</script>
+
+@ko.Initialize(Model)
+<script type="text/javascript">
+    glyph_opts = {
+        map: {
+            doc: "glyphicon glyphicon-file",
+            docOpen: "glyphicon glyphicon-file",
+            checkbox: "glyphicon glyphicon-unchecked",
+            checkboxSelected: "glyphicon glyphicon-check",
+            checkboxUnknown: "glyphicon glyphicon-share",
+            dragHelper: "glyphicon glyphicon-play",
+            dropMarker: "glyphicon glyphicon-arrow-right",
+            error: "glyphicon glyphicon-warning-sign",
+            expanderClosed: "glyphicon glyphicon-plus-sign",
+            expanderLazy: "glyphicon glyphicon-plus-sign",  // glyphicon-expand
+            expanderOpen: "glyphicon glyphicon-minus-sign",  // glyphicon-collapse-down
+            folder: "glyphicon glyphicon-folder-close",
+            folderOpen: "glyphicon glyphicon-folder-open",
+            loading: "glyphicon glyphicon-refresh"
+        }
+    };
+    $(document).ready(function () {
+        $("#tree").fancytree({
+            titlesTabbable: true,        // Add all node titles to TAB chain
+            extensions: ["dnd", "edit", "glyph", "wide"],
+            source: [
+                { "title": "Node 1", "key": "1" },
+                {
+                    "title": "Folder 2", "key": "2", "folder": true, "children": [
+                        { "title": "Node 2.1", "key": "3" },
+                        { "title": "Node 2.2", "key": "4" }
+                    ]
+                }
+            ],
+            glyph: glyph_opts,
+            activeVisible: true, // Make sure, active nodes are visible (expanded).
+            keyboard: true, // Support keyboard navigation.
+            checkbox: true,
+            autoActivate: true, // Automatically activate a node when it is focused (using keys).
+            autoScroll: true, // Automatically scroll nodes into visible area.
+            focusOnSelect: true, // Set focus when node is checked by a mouse click
+            quicksearch: true, // Navigate to next node by typing the first letters.
+            //scroll: true,
+            //scrollSpeed: 7,
+            //scrollSensitivity: 10,
+            dnd: {
+                autoExpandMS: 400,
+                focusOnClick: true,
+                preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                dragStart: function (node, data) { return true; },
+                dragEnter: function (node, data) { return true; },
+                dragDrop: function (node, data) { data.otherNode.moveTo(node, data.hitMode); }
+            },
+            selectMode: 2,
+            toggleEffect: { effect: "drop", options: { direction: "left" }, duration: 400 },
+            wide: {
+                iconWidth: "1em",     // Adjust this if fancy-icon-width != "16px"
+                iconSpacing: "0.5em", // Adjust this if fancy-icon-spacing != "3px"
+                levelOfs: "1.5em"     // Adjust this if ul padding != "16px"
+            },
+            iconClass: function (event, data) {
+                if (data.node.isFolder()) {
+                    return "glyphicon glyphicon-book";
+                }
+            },
+            edit: {
+                triggerStart: ["f2", "shift+click", "mac+enter"],
+                close: function (event, data) {
+                    if (data.save && data.isNew) {
+                        // Quick-enter: add new nodes until we hit [enter] on an empty title
+                        $("#tree").trigger("nodeCommand", { cmd: "addSibling" });
+                    }
+                }
+            },            
+        });
+        $("#btnExpandAll").click(function () {
+            $("#tree").fancytree("getTree").visit(function (node) {
+                node.setExpanded(true);
+            });
+        });
+        $("#btnCollapseAll").click(function () {
+            $("#tree").fancytree("getTree").visit(function (node) {
+                node.setExpanded(false);
+            });
+        });
+
+        $.ajax({
+            url: '/EstadosModel/IndexJSON', type: 'POST', success: function (data) {
+                var viewModelTree = convertItemsToList(data.Items);
+                $('#tree').fancytree('getTree').reload(viewModelTree);
+                //data.Items = viewModelTree;
+                $("#textArea").text(JSON.stringify(viewModelTree)); // .stringify(viewModelTree);
+                viewModel = ko.mapping.fromJS(data);
+                viewModel.initialized = false;
+                viewModel.initialized(true);
+                //ko.applyBindings(viewModel);
+            }, error: function (error) { alert('There was an error posting the data to the server: ' + error.responseText); }
+        });
+    });
+</script>
+@*@ko.Apply(Model)*@
+@*@ko.LazyApply(Model, "IndexJSON", "EstadosModel")*@

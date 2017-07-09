@@ -1,0 +1,8 @@
+﻿@model DateTime?
+
+<div class='input-group date'>
+    @Html.TextBox("", Model, "{0:yyyy-MM-dd HH:mm:ss}", new { type = "text", @class = "form-control datetimepicker", placeholder = "Introduzca la fecha aquí..." } )
+    <span class="input-group-addon">
+        <span class="glyphicon glyphicon-calendar"></span>
+    </span>
+</div>

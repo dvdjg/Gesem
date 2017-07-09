@@ -1,0 +1,1847 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Gesem - Gestión empresarial</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- DataTables Responsive CSS -->
+
+    <link href="@Url.Content("~/bower_components/morrisjs/morris.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/bower_components/font-awesome/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Ibarra.css")" rel="stylesheet" type="text/css" />
+
+    <!-- jQuery -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/modernizr")
+    <!-- http://www.layoutit.com -->
+    <script src="~/signalr/hubs" type="text/javascript"></script>
+
+    <style>
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header" style="padding:25px 30px;">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4><span class="glyphicon glyphicon-lock"></span> Edición</h4>
+                    </div>
+                    <div class="modal-body" style="padding:20px 30px;">
+                        <form role="form">
+                            @*<div class="form-group">
+                                <label for="usrname"><span class="glyphicon glyphicon-user"></span> Username</label>
+                                <input type="text" class="form-control" id="usrname" placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
+                                <input type="text" class="form-control" id="psw" placeholder="Enter password">
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" value="" checked>Remember me</label>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Login</button>*@
+                        </form>
+                    </div>
+                    @*<div class="modal-footer">
+                        <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+                        <p>Not a member? <a href="#">Sign Up</a></p>
+                        <p>Forgot <a href="#">Password?</a></p>
+                    </div>*@
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="wrapper">
+        <!-- Navigation -->
+        @Html.Action("Index", "Navbar")
+        <div id="page-wrapper">
+            <!-- Modal -->
+            <div class="modal fade" id="myConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myConfirmModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myConfirmModalLabel">Pregunta</h4>
+                        </div>
+                        <div class="modal-body">
+                            ¿Está seguro de que desea <span class="txtConfirmModalAccion">Borrar</span> los elementos seleccionados?
+                            <ul class="selected-list scroll_list"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="container" style="width:100%">
+                                <div class="row">
+                                    <div class="col-md-6"></div>
+                                    <div class="col-md-3">
+                                        <button type="button" class="btn btn-danger btn-block" data-dismiss="modal">Cancelar</button>
+                                    </div>
+                                    <div id="formAction" class="col-md-3">
+                                        <button type="submit" class="btn btn-success btn-block" data-dismiss="modal"><span class="txtConfirmModalAccion">Borrar</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section id="page">
+                @RenderBody()
+            </section>
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+    <script type="text/javascript">
+        Mediator.prototype.tmsg = {};
+        Mediator.prototype.timepublish = function(subName, status, obj) {
+            var self = this;
+            var subMsg = self.tmsg[subName];
+            if (subMsg == null) {
+                subMsg = self.tmsg[subName] = {};
+            }
+            var statusArr = subMsg[status];
+            if (statusArr == null) {
+                statusArr = subMsg[status] = [];
+            }
+            statusArr.push(obj);
+            clearTimeout(self.timerefresh);
+            self.timerefresh = setTimeout(function () {
+                $.each(self.tmsg, function (subName, subMsg) {
+                    $.each(subMsg, function (status, obj) {
+                        mediator.publish(subName, status, obj);
+                        //subMsg[status] = [];
+                    });
+                    self.tmsg[subName] = {}; // Limpia el objeto
+                });
+                //self.tmsg = {};
+            }, 260);
+        }
+        mediator = new Mediator();
+
+        moment.locale('es'); // change the global locale to Spanish
+
+        function hasUndefined(a) {
+            return a.indexOf() !== -1;
+        }
+
+        // Centraliza el sistema de notificaciones de usuario
+        function notify(object) {
+            // http://sciactive.github.io/pnotify
+            //swal(object);
+            object.buttons = {
+                closer: false,
+                sticker: false
+            };
+            object.animate = {
+                animate: true,
+                in_class: "bounceInUp",
+                out_class: object.type == "error" ? "hinge" : "bounceOutUp"
+            };
+            var notice = new PNotify(object);
+            notice.get().click(function () {
+                notice.remove();
+            });
+        }
+        // Aspecto del fancytree
+        var glyph_opts = {
+            map: {
+                doc: "glyphicon glyphicon-file",
+                docOpen: "glyphicon glyphicon-file",
+                checkbox: "glyphicon glyphicon-unchecked",
+                checkboxSelected: "glyphicon glyphicon-check",
+                checkboxUnknown: "glyphicon glyphicon-share",
+                dragHelper: "glyphicon glyphicon-play",
+                dropMarker: "glyphicon glyphicon-arrow-right",
+                error: "glyphicon glyphicon-warning-sign",
+                expanderClosed: "glyphicon glyphicon-plus-sign",
+                expanderLazy: "glyphicon glyphicon-plus-sign",  // glyphicon-expand
+                expanderOpen: "glyphicon glyphicon-minus-sign",  // glyphicon-collapse-down
+                folder: "glyphicon glyphicon-folder-close",
+                folderOpen: "glyphicon glyphicon-folder-open",
+                loading: "glyphicon glyphicon-refresh"
+            }
+        };
+
+        // http://stackoverflow.com/questions/645555/should-jquerys-form-submit-not-trigger-onsubmit-within-the-form-tag
+        function submitForm(form) {
+            //get the form element's document to create the input control with
+            //(this way will work across windows in IE8)
+            var button = form.ownerDocument.createElement('input');
+            //make sure it can't be seen/disrupts layout (even momentarily)
+            button.style.display = 'none';
+            //make it such that it will invoke submit if clicked
+            button.type = 'submit';
+            //append it and click it
+            form.appendChild(button).click();
+            //if it was prevented, make sure we don't get a build up of buttons
+            form.removeChild(button);
+        }
+
+        // http://stackoverflow.com/questions/10457264/how-to-find-first-element-of-array-matching-a-boolean-condition-in-javascript
+        // Returns the first element of an array that satisfies given predicate
+        Array.prototype.findFirst = function (predicateCallback) {
+            if (typeof predicateCallback !== 'function') {
+                return undefined;
+            }
+            for (var i = 0; i < this.length; i++) {
+                if (i in this && predicateCallback(this[i]))
+                    return this[i];
+            }
+            return undefined;
+        };
+
+        //function logEvent(event, data, msg) {
+        //    //        var args = $.isArray(args) ? args.join(", ") :
+        //    msg = msg ? ": " + msg : "";
+        //    $.ui.fancytree.info("Event('" + event.type + "', node=" + data.node + ")" + msg);
+        //}
+        function arrayToTreeData(childList) {
+            var parent, nodeMap = {};
+            var ret = [];
+
+            // Pass 1: store all tasks in reference map
+            $.each(childList, function (i, c) {
+                if (c._id > 0) { // No mostrar el nodo raíz que tendrá índice 0. c != null &&
+                    item = { key: c._id, title: c._nombre, tooltip: c._descripcion, PadreId: c.padreId };
+                    ret.push(item);
+                    nodeMap[item.key] = item;
+                }
+            });
+            // Pass 2: adjust fields and fix child structure
+            ret = $.map(ret, function (c) {
+                // Rename 'key' to 'Id'
+                //c.children = []; // Que siempre haya un campo children para la expansión del template "itemTmpl"
+                if (c.PadreId == c.key)
+                    c.PadreId = 0;
+
+                // Check if c is a child node
+                if (c.PadreId) {
+                    // add c to `children` array of parent node
+                    parent = nodeMap[c.PadreId];
+                    if (parent == null) {
+                        console.log("No se encuentra el padre de: " + JSON.stringify(c));
+                    } else {
+                        parent.folder = true;
+                        if (parent.children) {
+                            parent.children.push(c);
+                        } else {
+                            parent.children = [c];
+                        }
+                    }
+                    return null;  // Remove c from childList
+                }
+                return c;  // Keep top-level nodes
+            });
+            // Pass 3: sort chldren by 'position'
+            $.each(ret, function (i, c) {
+                if (c.children && c.children.length > 1) {
+                    c.children.sort(function (a, b) {
+                        ///return ((a.position < b.position) ? -1 : ((a.position > b.position) ? 1 : 0));
+                        return a.title.localeCompare(b.title);
+                    });
+                }
+            });
+            return ret;
+        }
+
+        // Copia el valor de este registro a un nodo compatible con fancytree.
+        // Si no se puede copiar (pe. Ha cambiado de padre) devuelve false
+        function CopyToFancyNode(record, node) {
+            if (node != null && node.parent != null && node.parent.key == record.PadreId) { // (node.data.PadreId == record.PadreId())
+                node.title = record._nombre;
+                node.tooltip = record._descripcion;
+                return true;
+            }
+            return false;
+        }
+
+        // Función simple para copiar miembro a miembro
+        function memberCopy(from, to) {
+            for (var k in from)
+                to[k] = from[k];
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////
+        // El modelo más simple:
+        var IdModel = function (other) {
+            this.Id = -1;
+            if (other != null) {
+                this.copyFrom(other);
+            }
+        }
+        function getId(record) {
+            return record.Id;
+        }
+        function getNombre(record) {
+            if (record.Nombre != null)
+                return record.Nombre;
+            if (record.Name != null)
+                return record.Name;
+            if (record.UserName != null)
+                return record.UserName;
+            return "";
+        }
+        IdModel.prototype = {
+            copyFrom(other) {
+                memberCopy(other, this);
+            },
+            copyTo(other) {
+                memberCopy(this, other);
+            },
+
+            // Funciones auxiliares (alias)
+            get _id() {
+                return getId(this);
+            },
+            set _id(value) {
+                this.Id = value;
+            },
+            //get _nombre() {
+            //    return getNombre(this);
+            //},
+            //set _nombre(value) {
+            //    if (this.UserName != null)
+            //        this.UserName = value;
+            //    else if (this.Name != null)
+            //        this.Name = value;
+            //    else
+            //        this.Nombre = value;
+            //},
+            get _descripcion() {
+                if (this.Descripcion != null)
+                    return this.Descripcion;
+                if (this.Description != null)
+                    return this.Description;
+                return this._nombre;
+            },
+            set _descripcion(value) {
+                if (this.Description != null)
+                    this.Description = value;
+                else
+                    this.Descripcion = value;
+            },
+            get padreId() {
+                if (this.PadreId != null)
+                    return this.PadreId;
+                else
+                    return 0;
+            },
+            set padreId(value) {
+                this.PadreId = value;
+            }
+        }
+        Object.defineProperties(IdModel.prototype, {
+            _nombre: {
+                get: function () {
+                    return getNombre(this);
+                },
+                set: function (value) {
+                    if (this.UserName != null)
+                        this.UserName = value;
+                    else if (this.Name != null)
+                        this.Name = value;
+                    else
+                        this.Nombre = value;
+                },
+                enumerable: true,
+                configurable: true
+            }
+        });
+
+        var g_viewModels = {};
+        function getViewModel(name) {
+            if (g_viewModels[name] == null) {
+                g_viewModels[name] = new recordListViewModel(name);
+            }
+            return g_viewModels[name];
+        }
+
+        //Record List View Model
+        function recordListViewModel(viewModelName, recordsHub) {
+            var self = this;
+            this.viewModelName = viewModelName;
+            var subName = 'App:' + viewModelName + ':' + viewModelName;
+            if (recordsHub == null)
+                recordsHub = $.connection[viewModelName + "Hub"];
+            if (recordsHub == null) {
+                swal("Error", "No se ha podido cargar " + viewModelName + "Hub", "error");
+                return null;
+            }
+            this.RecordsHub = recordsHub;
+
+            this.records = {};
+            this.hubInfo = null; // {"now":"2016-01-03T03:32:18.9196562+01:00","blankRecord":{"Id":0,"Nombre":null,"Descripcion":null,"PadreId":1},"recordProperties":{"EstadosBasic":[{"Name":"Id","Type":"Int32","Attribute":{"KeyAttribute":null,"DefaultValueAttribute":[-1],"DisplayAttribute":{"Name":"Id"}}},{"Name":"Nombre","Type":"String","Attribute":{"RequiredAttribute":{"ErrorMessage":"Introduzca el nombre del Estado"},"DisplayAttribute":{"Name":"Estado"},"MaxLengthAttribute":[100]}},{"Name":"Descripcion","Type":"String","Attribute":{"DisplayAttribute":{"Name":"Descripción"}}},{"Name":"PadreId","Type":"Int32","Attribute":{"DisplayAttribute":{"Name":"PadreId"},"DefaultValueAttribute":[0]}}],"EstadosVM":[{"Name":"Padre","Type":"String","Attribute":{"DisplayAttribute":{"Name":"Padre"}}}]}}
+            this.setHubInfo = function (info) {
+                this.hubInfo = info;
+                // Esta función se debe llamar antes de que se recuperen datos del servidor
+                self.recordViewModel = function (other) {
+                    this.Id = -1;
+                    if (other != null) {
+                        this.copyFrom(other);
+                    }
+                }
+                self.recordViewModel.prototype = Object.create(IdModel.prototype);
+                self.recordViewModel.prototype.constructor = self.recordViewModel;
+
+                var objPrompts = {};
+                $.each(info.recordProperties, function (baseClass, val) {
+                    var proplist = info.recordProperties[baseClass];
+                    $.each(proplist, function (index, prop) {
+                        //var ro = (prop.Attribute.ReadOnlyAttribute == true || "KeyAttribute" in prop.Attribute);
+                        var name = prop['Name'];
+                        var type = prop['Type'];
+                        var arr = prop['Array'];
+                        if (prop.Attribute.DisplayAttribute != null) {
+                            var att = prop.Attribute.DisplayAttribute;
+                            if (att.Prompt != null) {
+                                if (objPrompts[att.Prompt] == null)
+                                    objPrompts[att.Prompt] = [name];
+                                else
+                                    objPrompts[att.Prompt].push(name);
+                            }
+                        }
+                    });
+                });
+                $.each(objPrompts, function (index, obj) {
+                    Object.defineProperty(self.recordViewModel.prototype, index, {
+                        get: function () {
+                            var self = this;
+                            var arr = obj.map(function (name) {
+                                return self[name];
+                            });
+                            return arr.join(" ");
+                        },
+                        set: function (value) {
+                            this[obj[0]] = value;
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+                });
+                //self.recordViewModel = recordViewModel;
+            }
+            var bNotifyServer = true;
+            this.clear = function () {
+                mediator.unsubscribe(subName);
+            }
+
+            function consoleLog(str, params) {
+                console.log("[" + viewModelName + "] " + str);
+            }
+
+            // Llamada para notificar al modelo que se han añadido o modificado registros
+            this.addRecords = function (records) {
+                $.each(records, function (key, record) {
+                    var Id = getId(record);
+                    var rec = self.records[Id];
+                    if (rec == null) { // El registro no está en el array local 'records' (No se había solicitado explícitamente)
+                        var rvm = new self.recordViewModel(record);
+                        self.records[rvm._id] = rvm;
+                        mediator.timepublish(subName, 'added', { value: [rvm] });
+                    } else {
+                        rec.copyFrom(record);
+                        mediator.timepublish(subName, 'updated', { value: [rec] });
+                    }
+                });
+            }
+
+            this.addRecordsById = function(Ids) {
+                var deferred = $.Deferred();
+                // Hace una petición para recuperar los registros completos a partir de sus ids.
+                // Puede que no se reciban aquellos a los que no tengamos permiso.
+                self.RecordsHub.server.getRecordsById(Ids).done(function (records) {
+                    consoleLog('Respuesta del servidor getRecordsById(' + JSON.stringify(Ids) + '): ' + JSON.stringify(records, null, 2));
+                    bNotifyServer = false;
+                    // Añade los registros a la tabla actual
+                    self.addRecords(records);
+                    bNotifyServer = true;
+                    deferred.resolve(records);
+                }).fail(function (e) {
+                    console.warn("Rechazado por el servidor getRecordsById(" + JSON.stringify(Ids) + "): \nError: " + e);
+                    deferred.reject(e);
+                });
+                return deferred.promise();
+            };
+
+            // Borra registros por Id. Devuelve un array con todos los registros borrados.
+            this.removeRecordsById = function (ids) {
+                var removed = [];
+                ids.forEach(function (id) {//, index, array
+                    var rec = self.records[id];
+                    if (rec != null) {
+                        removed.push(self.records[id]);
+                        delete self.records[id];
+                    }
+                });
+                if (removed.length > 0) {
+                    mediator.timepublish(subName, 'deleted', { value: removed });
+                }
+                return removed;
+            }
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Diálogo modal para borrar registros
+            function dialogoBorraRegistros(selected) {
+                var myConfirmModal = $('#myConfirmModal');
+                myConfirmModal.find('btn-success').prop('disabled', false);
+                var list = $('.selected-list');
+                list.empty();
+                for (var r of selected) {
+                    list.append('<li>' + r._nombre + ': <small>' + r._descripcion) + '</small></li>';
+                }
+                $('#formAction').unbind('click');
+                $('#formAction').click(function () {
+                    // Devuelve un array de ids
+                    //$('#formAction').unbind('click');
+                    myConfirmModal.find('btn-success').prop('disabled', true);
+                    var ids = $.map(selected, function (r) { return r._id; });
+                    self.requestDeleteRecords(ids, false).done(function () {
+                        swal({
+                            title: '¡Borrado!',
+                            text: 'El registro ha sido borrado.',
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    }).fail(function () {
+                        myConfirmModal.find('btn-success').prop('disabled', false);
+                        swal({
+                            title: 'No Borrado',
+                            text: 'El registro no ha podido ser borrado.',
+                            type: "error"
+                        });
+                    });
+                });
+                $(".txtConfirmModalAccion").text("Borrar");
+                myConfirmModal.modal('show'); // data-toggle="modal" data-target="#myConfirmModal"
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Diálogo modal para clonar registros
+            function dialogoClonaRegistros(selected) {
+                var list = $('.selected-list');
+                list.empty();
+                for (var r of selected) {
+                    list.append('<li>' + r._nombre + ': <small>' + r._descripcion) + '</small></li>';
+                }
+                $('#formAction').unbind('click');
+                $('#formAction').click(function () {
+                    // Devuelve un array de ids
+                    $('#formAction').unbind('click');
+                    var ids = $.map(selected, function (r) { return r._id; });
+                    self.requestCloneRecords(ids, false).done(function () {
+                        swal({
+                            title: '¡Clonado!',
+                            text: 'El registro ha sido clonado.',
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    }).fail(function () {
+                        swal({
+                            title: 'No Clonado',
+                            text: 'El registro no ha podido ser clonado.',
+                            type: "error"
+                        });
+                    });
+                });
+                $(".txtConfirmModalAccion").text("Clonar");
+                $('#myConfirmModal').modal('show'); // data-toggle="modal" data-target="#myConfirmModal"
+            }
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Crea un Datatable basándose en el dom proporcionado y para un cierto modelo de registros (view model)
+            // domTable: DOM de la tabla según la retorna jQuery
+            // filtered: Objeto que contiene los miembros filtered.filteredRecords = []; filtered.queryToken = "";
+            function initDatatableInner(domTable, filtered, columns, initCompleteCallback) {
+                if (filtered == null)
+                    filtered = self;
+                if (initCompleteCallback == null) {
+                    initCompleteCallback = function () {
+                        var cols = this.api().columns();
+                        cols.every(function () {
+                            var column = this;
+                            var header = column.header();
+                            var footer = column.footer();
+                            if (footer == null)
+                                return;
+                            if ($(footer).hasClass("dt-search-select")) {
+                                var select = $('<select><option value=""></option></select>')
+                                    .appendTo($(footer).empty())
+                                    .on('change', function () {
+                                        var val = $.fn.dataTable.util.escapeRegex(
+                                            $(this).val()
+                                        );
+                                        column.search(val ? val : '', true, false).draw(); // '^' + val + '$'
+                                    });
+                                column.data().unique().sort().each(function (d, j) {
+                                    select.append('<option value="' + d + '">' + d + '</option>')
+                                });
+                            } else if ($(footer).hasClass("dt-search-text")) {
+                                var title = $(header).text();
+                                $(footer).html('<input type="text" placeholder="Busca ' + title + '" />');
+                                $('input', footer).on('keyup change', function () {
+                                    if (column.search() !== this.value) {
+                                        column.search(this.value).draw(); // Busca lo que tenga <input> en ese momento
+                                    }
+                                });
+                            } else if ($(footer).hasClass("dt-search-integer")) {
+                                // http://stackoverflow.com/questions/891696/jquery-what-is-the-best-way-to-restrict-number-only-input-for-textboxes-all
+                                var title = $(header).text();
+                                $(footer).html('<input type="text" placeholder="Busca ' + title + '" />');
+                                $('input', footer).on('keyup change', function () {
+                                    this.value = this.value.replace(/[^0-9]/g, '');
+                                    if (column.search() !== this.value) {
+                                        column.search(this.value).draw(); // Busca lo que tenga <input> en ese momento
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+                // Devuelve la altura necesaria para que quepa la tabla entera en la ventana desde la posición actual
+                function calcDataTableHeight() {
+                    var height = $(window).height() - 300;
+                    return Math.max(150, height);
+                };
+
+                function calcDataTableHeightFromParent() {
+                    var parent = domTable.parent();
+                    var top = parent.offset().top;
+                    var height = $(window).height() - top - 105;
+                    return height;
+                };
+
+                var retDatatable = domTable.DataTable({
+                    initCompleteCallback: initCompleteCallback,
+                    responsive: {
+                        details: {
+                            type: 'column',
+                            target: -1
+                        }
+                    },
+                    autoWidth: true, // Hace que tenga una anchura excesiva si se pone a false
+                    processing: true,
+                    serverSide: true,
+                    ajax: function (data, callback, settings) {
+                        // http://datatables.net/manual/server-side
+                        var draw = -1;
+                        var count = 40;
+                        //self.requestRecordData(data.start, data.length, data.search.value, data.search.regex);
+                        (function wait() {
+                            // Esperar a que haya datos en el array
+                            var recordsFiltered = filtered.filteredRecords.length;
+                            var queryToken = {
+                                recordsTotal: recordsFiltered, recordsFiltered: recordsFiltered, search: data.search, order: data.order, columns: data.columns
+                            };
+                            var queryTokenString = JSON.stringify(queryToken).toLowerCase();
+                            var filteredQueryTokenString = JSON.stringify(filtered.queryToken).toLowerCase();
+                            if (filteredQueryTokenString == queryTokenString) {
+                                // Comprueba que en el rango mostrado, todos los valores están actualizados
+                                var last = Math.min(recordsFiltered, data.start + data.length)
+                                var sliced = filtered.filteredRecords.slice(data.start, last);
+                                var bInvalido = false;
+                                for (var i = 0, l = sliced.length; i < l; i++) {
+                                    // Buscar en el array si hay alún elemento que necesite descargarse del servidor
+                                    if (typeof (sliced[i]) == 'undefined' || sliced[i] == null || sliced[i].Id == -1) {
+                                        bInvalido = true;
+                                        break;
+                                    };
+                                };
+                                // Si todos están cargados, no debe encontrar ninguno
+                                if (!bInvalido) {
+                                    // Devolver una copia de la sección correspondiente del array local del recordsModel
+                                    callback({
+                                        draw: data.draw,
+                                        data: sliced,
+                                        recordsFiltered: recordsFiltered,
+                                        recordsTotal: recordsFiltered
+                                    });
+                                    return;
+                                }
+                            } else {
+                                //consoleLog("filtered.queryToken=" + filtered.queryToken);
+                                //consoleLog("th.queryToken=" + queryToken);
+                            }
+                            if (data.draw != draw) { // || count == 10
+                                if (isNaN(data.length) || data.length < 200) {
+                                    // Pedir más datos de los necesarios para reducir el número de peticiones
+                                    data.length = 200;
+                                }
+                                // Hacer una petición de datos si no se habían pedido ya
+                                self.requestRecords(data).done(function (result) {
+                                    self.recordRange(result, filtered);
+                                });
+                                draw = data.draw;
+                            }
+                            if (--count <= 0)
+                                return;
+                            setTimeout(wait, 250);
+                        })();
+                    },
+                    dom: 'BfrtiS',
+                    //fixedHeader: true,
+                    scrollY: calcDataTableHeight(), //  '50vh'
+                    scrollX: "100%",
+                    scrollXInner: "99%",
+                    scroller: true,
+                    // no funciona scrollCollapse : true,
+                    deferRender: true,
+                    paging: true,
+                    rowId: 'Id',
+                    columns: columns,
+                    columnDefs: [{
+                        orderable: false,
+                        className: 'select-checkbox',
+                        targets: 0
+                    },
+                        { className: 'control', orderable: false, targets: -1 }
+                    ],
+                    select: {
+                        style: "@(MvcApplication.isMobileBrowser ? "multi" : "os")", // "single"
+                        selector: 'td:first-child'
+                    },
+                    language: {
+                        "url": "@Url.Content("~/Scripts/Datatables.ES_es.json")"
+                    },
+                    colReorder: true,
+                    buttons: [
+                                {
+                                    text: '<span title="Añadir Registro"><i class="glyphicon glyphicon-plus"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Crear</span></span></span></span>',
+                                    action: function () {
+                                        var modal = $("#myModal");
+                                        self.dialogoEditaRegistros(modal, false);
+                                        modal.modal();
+                                    }
+                                },
+                            {
+                                extend: 'colvis',
+                                text: '<span title="Visivilidad de las columnas"><i class="fa fa-columns"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Columnas</span></span></span></span>'
+                            },
+                                {
+                                    text: '<span title="Recargar Tabla"><i class="fa fa-refresh"></i> <span class="hidden-md"><span class="hidden-sm"><span class="hidden-xs">Recargar</span></span></span></span>',
+                                    action: function () {
+                                        //retDatatable.ajax.reload();
+                                        timerResize();
+                                        reloadTable();
+                                    }
+
+                                },
+                    {
+                        extend: 'selectAll',
+                        text: '<span title="Seleccionar Todo"><i class="fa fa-list-ul"></i> <span class="hidden-sm"><span class="hidden-xs">Todo</span></span></span>'
+                    },
+                    {
+                        extend: 'selectNone',
+                        text: '<span title="Deseleccionar Todo"><i class="fa fa-bars"></i> <span class="hidden-sm"><span class="hidden-xs">Nada</span></span></span>'
+                    },
+                    {
+                        extend: 'selected',
+                        text: '<span title="Borrar Seleccionados"><i class="glyphicon glyphicon-erase"></i> <span class="hidden-sm"><span class="hidden-xs boton-borrar-span">Borrar</span></span></span>',
+                        action: function (e, dt, node, config) {
+                            var idArray = [];
+                            retDatatable.rows('.selected').every(function (rowIdx, tableLoop, rowLoop) {
+                                idArray.push(this.data());
+                            });
+                            dialogoBorraRegistros(idArray);
+                        }
+                    },
+                    {
+                        extend: 'selected',
+                        text: '<span title="Clonar Seleccionados"><i class="glyphicon glyphicon-duplicate"></i> <span class="hidden-sm"><span class="hidden-xs boton-clonar-span">Clonar</span></span></span>',
+                        action: function (e, dt, node, config) {
+                            var idArray = [];
+                            retDatatable.rows('.selected').every(function (rowIdx, tableLoop, rowLoop) {
+                                idArray.push(this.data());
+                            });
+                            dialogoClonaRegistros(idArray);
+                        }
+                    },
+                         {
+                             extend: 'collection',
+                             text: '<span title="Exportar Todo"><i class="glyphicon glyphicon-export"></i> <span class="hidden-xs">Exportar</span></span>',
+                             buttons: [
+                                  {
+                                      extend: 'print',
+                                      text: '<span title="Imprimir tabla"><i class="fa fa-print"></i> Imprimir</span>',
+                                      @*customize: function (win) {
+                                          $(win.document.body)
+                                              .css('font-size', '10pt')
+                                              .prepend(
+                                                  '<img src="@Url.Content("~/Content/images/logo.png")" style="position:absolute; top:0; left:0;opacity: 0.3;filter: alpha(opacity=30);" />'
+                                              );
+
+                                          $(win.document.body).find('table')
+                                              .addClass('compact')
+                                              .css('font-size', 'inherit');
+                                      },
+                                      exportOptions: {
+                                          modifier: {
+                                              selected: true
+                                          }
+                                      },
+                                      message: 'Impresión de la tabla'*@
+                                  },
+                                {
+                                    extend: 'copyHtml5',
+                                    text: '<span title="Copia al Portapapeles"><i class="glyphicon glyphicon-paperclip"></i> Portapapeles</span>'
+                                },
+                                {
+                                    extend: 'excelHtml5',
+                                    text: '<span title="Microsoft Excel"><i class="fa fa-file-excel-o"></i> Excel</span>'
+                                },
+                                {
+                                    extend: 'csvHtml5',
+                                    text: '<span title="Comma Separated Values"><i class="fa fa-file-text-o"></i> CSV</span>',
+                                    exportOptions: {
+                                        columns: ':visible'
+                                    }
+                                },
+                                {
+                                    extend: 'pdfHtml5',
+                                    text: '<span title="Portable Document Format"><i class="fa fa-file-pdf-o"></i> PDF</span>'
+                                }
+                             ]
+                         }
+                    ]
+                    //, stateSave: true,
+                    //stateDuration: -1
+                });
+
+                function selectionChange() {
+                    var nSelect = retDatatable.rows('.selected').data().length;
+                    var nText = (nSelect > 0) ? " (" + nSelect + ")" : "";
+                    // Actualizar el texto del botón de borrar registros
+                    var wrapper = domTable.parents(".dataTables_wrapper");
+                    wrapper.find('.boton-borrar-span').text('Borrar' + nText);
+                    wrapper.find('.boton-clonar-span').text('Clonar' + nText);
+                };
+                // Detectar cambios en las filas seleccionadas
+                retDatatable
+                    .on('select', function (e, dt, type, indexes) {
+                        selectionChange();
+                    })
+                    .on('deselect', function (e, dt, type, indexes) {
+                        selectionChange();
+                    });
+                function update_size() {
+                    var dt = domTable.dataTable();
+                    dt._fnScrollDraw();
+                    domTable.closest(".dataTables_scrollBody").height(calcDataTableHeight());
+                    //retDatatable.responsive.rebuild();
+                    retDatatable.responsive.recalc();
+                    retDatatable.columns.adjust().responsive.recalc();
+                }
+                function timerResize() {
+                    // No actualiza la tabla mientras que sigan habiendo eventos de redimensión
+                    clearTimeout(retDatatable.refresh_size);
+                    retDatatable.refresh_size = setTimeout(update_size, 200);
+                }
+                setTimeout(update_size, 200);
+                $(window).resize(timerResize);
+                function reloadTable()
+                {
+                    // Acumular cambios antes de repintar la tabla
+                    clearTimeout(retDatatable.reloadTableTimer);
+                    retDatatable.reloadTableTimer = setTimeout(function () {
+                        consoleLog("reloadTable()");
+                        retDatatable.ajax.reload(null, false); // false: user paging is not reset on reload
+                    }, 250);
+                }
+                mediator.subscribe(subName, function (status, changes) {
+                    // Ante cualquier cambio, recarga la tabla
+                    if (retDatatable != null) {
+                        if (status === 'added' || status === 'deleted') {
+                            for (var change of changes) {
+                                // Fuerza que se recarguen los datos desde el servidor
+                                filtered.filteredRecords.length = 0;
+                                filtered.queryRecords = "";
+                                consoleLog("subscribeDatatable(): The '" + status + "' element is:", JSON.stringify(change.value));
+                                //break;
+                            }
+                        }
+                        reloadTable();
+                    }
+                });
+                return retDatatable;
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Inicia un objeto Datatable vinculado con este modelo
+            // domContainer: elemento DOM al que se le añadirá la tabla
+            // filtered: Objeto que contiene los miembros filtered.filteredRecords = []; filtered.queryToken = "";
+            // columns: [
+            //     { data: null, width: "1", orderable: false, defaultContent: '', searchable: false },
+            //     { data: "Id", width: "4", className: "dt-right" },
+            //     { data: "Nombre", render: function (data, type, full) { return '<a href="/Estados/Edit/' + full['Id'] + '">' + data + '</a>'; } }, // '<a href="#" onclick="vm.Edit(' + full['Id'] + ')">' + data + '</a>'
+            //     { data: "Descripcion" },
+            //     { data: "PadreId", width: "4" },
+            //     { data: "Padre" },
+            //     { data: null, width: "1", orderable: false, defaultContent: '', searchable: false },
+            //   ];
+            this.initDatatable = function (domContainer, filtered, columns, initCompleteCallback) {
+                var domTable = $('<table class="table display dt-responsive compact" border="0" cellspacing="0" style="padding-left:0px;">' +
+                    '<thead><tr></tr></thead><tbody></tbody><tfoot><tr></tr></tfoot></table>').appendTo(domContainer); // id="datatable"
+                if (filtered == null)
+                    filtered = self;
+                self.requestHubInfo(false).done(function (info) {
+                    // Esperar a recibir la información del hub para conocer los metadatos del registro y generar las columnas
+                    var cols = [{ data: null, width: "1", orderable: false, defaultContent: '', searchable: false }];
+                    var thead = domTable.find("thead tr");
+                    var tfoot = domTable.find("tfoot tr");
+                    if (thead) {
+                        thead.empty();
+                        thead.append("<th></th>"); // Columna de selección
+                    }
+                    if (tfoot) {
+                        tfoot.empty();
+                        tfoot.append("<th></th>"); // Columna de selección
+                    }
+                    $.each(info.recordProperties, function (baseClass, val) {
+                        var proplist = info.recordProperties[baseClass];
+                        $.each(proplist, function (index, prop) {
+                            //var ro = (prop.Attribute.ReadOnlyAttribute == true || "KeyAttribute" in prop.Attribute);
+                            var name = prop['Name'];
+                            var type = prop['Type'];
+                            var arr = prop['Array'];
+                            var display = (prop.Attribute.DisplayAttribute == null) ? name : prop.Attribute.DisplayAttribute.Name;
+                            var obj = { data: name };
+                            if ("AmbientValueAttribute" in prop.Attribute) {
+                                var ambient = prop.Attribute.AmbientValueAttribute;
+                                var model = /([^.,]+),/g.exec(ambient[0])[1];
+                                var member = ambient[1];
+                                var viewModel = getViewModel(model);
+                                obj.render = function (data, type, row) {
+                                    if (data == null)
+                                        return "NUL";
+                                    if (arr == true ||$.isArray(data)) {
+                                        // Relación many to many
+                                        var arrmap = $.map(data, function (val) {
+                                            var rec = viewModel.records[val];
+                                            return rec != null ? rec._nombre : "NULL";
+                                        });
+                                        return '<span class="">' + arrmap.join(", ") + '</span>';
+                                    } else {
+                                        var rec = viewModel.records[data];
+                                        return rec != null ? '<span class="">' + rec._nombre + '</span>' : "NULL";
+                                    }
+                                }
+                            } else if (type == "Int32") {
+                                obj.width = 4;
+                                obj.className = "dt-right";
+                            } else if (type == "DateTime") {
+                                obj.render = function (data, type, row) {
+                                    if (data == null)
+                                        return data;
+                                    var dt = moment(data);
+                                    return dt.format("llll");
+                                }
+                            } else if (type == "Boolean") {
+                                obj.render = function (data, type, row) {
+                                    return (data === true) ? '<span class="glyphicon glyphicon-ok"></span>' : '<span class="glyphicon glyphicon-remove"></span>';
+                                }
+                            }
+                            cols.push(obj);
+                            if (thead) {
+                                var cls = "";
+                                if (name == "Nombre" || name == "Name")
+                                    cls = ' class="all"'; // Si es un campo principal, que se muestre siempre
+                                thead.append("<th" + cls + ">" + display + "</th>"); // Muestra el resto de elementos de la fila
+                            }
+                            if (tfoot) {
+                                var cls = "";
+                                if (type == "String")
+                                    cls = "dt-search-text";
+                                else
+                                    cls = "dt-search-integer";
+                                tfoot.append('<th class="' + cls + '">' + display + "</th>"); // Muestra el resto de elementos de la fila
+                            }
+                        });
+                    });
+                    if (thead) {
+                        thead.append("<th class='all'></th>"); // Edición
+                        thead.append("<th></th>"); // Muestra el resto de elementos de la fila
+                    }
+                    if (tfoot) {
+                        tfoot.append("<th></th>"); // Edición
+                        tfoot.append("<th></th>"); // Muestra el resto de elementos de la fila
+                    }
+                    cols.push({
+                        data: null, width: "1", orderable: false, defaultContent: '', searchable: false,
+                        defaultContent: '<span type="button" class="button glyphicon glyphicon-edit btn-edit control"></span>'
+                    });
+                    cols.push({
+                        data: null, width: "1", orderable: false,
+                        defaultContent: '', searchable: false
+                    });
+                    if (columns == null)
+                        columns = cols;
+                    var datatable = initDatatableInner(domTable, filtered, columns, initCompleteCallback);
+                    domTable.find('tbody').on('click', '.btn-edit', function () {
+                        var data = datatable.row($(this).parents('tr')).data();
+                        var modal = $("#myModal");
+                        self.dialogoEditaRegistros(modal, false, data);
+                        modal.modal();
+                        //alert(JSON.stringify(data));
+                    });
+                });
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Hace que un FancyTree se actualice según este ViewModel (llamado desde initFancyTree)
+            //
+            function subscribeTree(tmp) {
+                var tree = tmp;
+                mediator.subscribe(subName, function (status, changes) {
+                    //var tree = fancyTree.fancytree('getTree');
+                    var bRefreshAll = false;
+                    /*for (var change of changes)*/ {
+                        consoleLog("subscribeTree(): The " + status + " element is:", JSON.stringify(changes));
+                        //if (bRefreshAll)
+                        //    continue;
+                        if (status === 'added' || status === 'deleted' || status === 'load') {
+                            bRefreshAll = true;
+                        } else if (status === 'updated') {
+                            for (var change of changes) {
+                                for (var val of change.value) {
+                                    var node = tree.getNodeByKey(val.Id.toString());
+                                    if (node != null) {
+                                        if (CopyToFancyNode(val, node)) {
+                                            node.render(true);
+                                            continue;
+                                        }
+                                    }
+                                    // Ha cambiado el padre o no se ha encontrado el registro en el fancytree
+                                    bRefreshAll = true;
+                                    //break;
+                                }
+                            }
+                        }
+                    }
+                    if (bRefreshAll) {
+                        // Recarga todo el árbol
+                        var viewModelTree = arrayToTreeData(self.records);
+                        tree.reload(viewModelTree);
+                    }
+                });
+            }
+
+            function recordFromTreeNode(r) {
+                return { _id: r.key, _nombre: r.title, _descripcion: r.tooltip };
+            }
+            function logEvent(event, data, msg) {
+                //        var args = $.isArray(args) ? args.join(", ") :
+                msg = msg ? ": " + msg : "";
+                msg = "Event('" + event.type + "', node=" + data.node + ")" + msg;
+                $.ui.fancytree.info(msg);
+                consoleLog(msg);
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            // Crea un Fancytree basándose en el dom proporcionado y para un cierto modelo de registros (view model)
+            //
+
+            this.initFancyTree = function (domFancytree, type) {
+                // Los hermanos del Fancytree pueden contener botones de actuación
+                var domFancytreeParent = domFancytree.parent();
+                var args = {
+                    titlesTabbable: true,        // Add all node titles to TAB chain
+                    extensions: ["dnd", "edit", "glyph", "wide", "persist"], //, "table", "childcounter"
+                    source: [],
+                    glyph: glyph_opts,
+                    keyboard: true,      // Support keyboard navigation.
+                    checkbox: true,
+                    activeVisible: true, // Make sure, active nodes are visible (expanded).
+                    autoActivate: true, // Automatically activate a node when it is focused (using keys).
+                    autoCollapse: true, // Automatically collapse all siblings, when a node is expanded.
+                    autoScroll: true, // Automatically scroll nodes into visible area.
+                    focusOnSelect: true, // Set focus when node is checked by a mouse click
+                    quicksearch: true,   // Navigate to next node by typing the first letters.
+                    //scroll: true,
+                    //scrollSpeed: 7,
+                    //scrollSensitivity: 10,
+                    childcounter: {
+                        deep: true,
+                        hideZeros: true,
+                        hideExpanded: true
+                    },
+                    dnd: {
+                        autoExpandMS: 400,
+                        focusOnClick: true,
+                        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                        dragStart: function (node, data) { return true; },
+                        dragEnter: function (node, data) { return true; },
+                        dragDrop: function (node, data) {
+                            if (!data.otherNode || node.key == null) {
+                                // It's a non-tree draggable
+                                alert("dropped " + $(data.draggable.element).text());
+                                return;
+                            }
+                            var other = data.otherNode;
+                            other.moveTo(node, data.hitMode);
+                            //var otherRecord = self.records.findFirst(function (value) { // Que se convierta en un hijo
+                            //    return value.Id == other.key;
+                            //});
+                            //var parentRecord = self.records.findFirst(function (value) { // Que se convierta en un hijo
+                            //    return value.Id == other.parent.key;
+                            //});
+                            var parentRecord = self.records[other.parent.key];
+                            var otherRecord = self.records[other.key];
+                            if (otherRecord != null) {
+                                if (parentRecord != null) {
+                                    otherRecord.PadreId = parentRecord.Id;
+                                } else {
+                                    otherRecord.PadreId = 0;
+                                }
+                                self.requestUpdateRecord(otherRecord);
+                            }
+                        }
+                    },
+                    selectMode: 3@*@(MvcApplication.isMobileBrowser ? 2 : 1)*@,
+                    toggleEffect: { effect: "drop", options: { direction: "left" }, duration: 400 },
+                    wide: {
+                        iconWidth: "1em",     // Adjust this if fancy-icon-width != "16px"
+                        iconSpacing: "0.5em", // Adjust this if fancy-icon-spacing != "3px"
+                        levelOfs: "1.5em"     // Adjust this if ul padding != "16px"
+                    },
+                    iconClass: function (event, data) {
+                        if (data.node.isFolder()) {
+                            return "glyphicon glyphicon-book";
+                        }
+                    },
+                    edit: {
+                        triggerStart: ["f2", "dblclick", "shift+click", "mac+enter"], // "shift+click",
+                        triggerCancel: ["esc", "click"],
+                        close: function (event, data) {
+                            if (data.save && data.isNew) {
+                                // Quick-enter: add new nodes until we hit [enter] on an empty title
+                                domFancytree.trigger("nodeCommand", { cmd: "addSibling" });
+                            }
+                            if (data.save) {
+                                $(data.node.span).addClass("pending");
+                            }
+                        },
+                        save: function (event, data) {
+                            var node = data.node;
+                            // Save data.input.val() or return false to keep the editor open
+                            var otherRecord = self.records[node.key];
+                            if (otherRecord != null) {
+                                var modified = new self.recordViewModel(otherRecord);
+                                // Acepta el nuevo nombre
+                                modified._nombre = data.input.val();
+                                self.requestUpdateRecord(modified, false).done(function (result) {
+                                    if (result != true)
+                                        node.setTitle(data.orgTitle);
+                                    if (data.input != null)
+                                        data.input.removeClass("pending");
+                                }).fail(function (result) {
+                                    node.setTitle(data.orgTitle);
+                                    if (data != null)
+                                        data.input.removeClass("pending");
+                                });
+                            }
+                            // Optimistically assume that save will succeed. Accept the user input
+                            return true;
+                        }
+                    },
+                    checkbox: true,
+                    persist: {
+                        // Available options with their default:
+                        cookieDelimiter: "~",    // character used to join key strings
+                        cookiePrefix: undefined, // 'fancytree-<treeId>-' by default
+                        cookie: { // settings passed to jquery.cookie plugin
+                            raw: false,
+                            expires: "",
+                            path: "",
+                            domain: "",
+                            secure: false
+                        },
+                        expandLazy: false, // true: recursively expand and load lazy nodes
+                        overrideSource: true,  // true: cookie takes precedence over `source` data attributes.
+                        store: "auto",     // 'cookie': use cookie, 'local': use localStore, 'session': use sessionStore
+                        types: "active expanded focus selected"  // which status types to store
+                    },
+                    select: function (event, data) {
+                        // Display list of selected nodes
+                        var selNodes = data.tree.getSelectedNodes();
+                        var nSelect = selNodes.length;
+                        var nText = (nSelect > 0) ? " (" + nSelect + ")" : "";
+                        // Actualizar el texto del botón de borrar registros
+                        domFancytreeParent.find('.boton-borrar-span').text('Borrar' + nText);
+                        domFancytreeParent.find('.boton-clonar-span').text('Clonar' + nText);
+                        if (nSelect == 0)
+                            domFancytreeParent.find('.buttons-select-none').addClass('disabled');
+                        else
+                            domFancytreeParent.find('.buttons-select-none').removeClass('disabled');
+                    },
+                    table: {
+                        checkboxColumnIdx: 1,
+                        nodeColumnIdx: 2
+                    },
+                    //renderColumns: function (event, data) {
+                    //    var node = data.node,
+                    //      $tdList = $(node.tr).find(">td");
+                    //    $tdList.eq(0).text(node.getIndexHier());
+                    //    $tdList.eq(3).text(!!node.folder);
+                    //}
+                    create: function (event, data) {
+                        logEvent(event, data);
+                    },
+                    init: function (event, data, flag) {
+                        logEvent(event, data, "flag=" + flag);
+                    },
+                    focusTree: function (event, data) {
+                        logEvent(event, data);
+                    },
+                    restore: function (event, data) {
+                        logEvent(event, data);
+                    },
+
+                };
+                if (type == "select") {
+                    args.extensions = ["glyph"]; // , "wide", "persist", "childcounter"
+                    args.selectMode = 1;
+                }
+                var fancytree = domFancytree.fancytree(args);
+                var tree = domFancytree.fancytree("getTree");
+                // Si hay un contenedor con botones, conectarlos
+                domFancytreeParent.find(".tree-expander").click(function () {
+                    tree.visit(function (node) {
+                        node.setExpanded(true);
+                    });
+                });
+                domFancytreeParent.find(".tree-collapser").click(function () {
+                    tree.visit(function (node) {
+                        node.setExpanded(false);
+                    });
+                });
+                domFancytreeParent.find("button.boton-crear").click(function () {
+                    var modal = $("#myModal");
+                    self.dialogoEditaRegistros(modal, false);
+                    modal.modal();
+                });
+                domFancytreeParent.find("button.boton-todo").click(function () {
+                    tree.visit(function (node) {
+                        node.setSelected(true);
+                    });
+                });
+                domFancytreeParent.find("button.boton-nada").click(function () {
+                    tree.visit(function (node) {
+                        node.setSelected(false);
+                    });
+                });
+                domFancytreeParent.find("button.boton-borrar").click(function () {
+                    var selNodes = tree.getSelectedNodes();
+                    var toDelete = $.map(selNodes, recordFromTreeNode);
+                    dialogoBorraRegistros(toDelete);
+                });
+                domFancytreeParent.find("button.boton-clonar").click(function () {
+                    var selNodes = tree.getSelectedNodes();
+                    var toClone = $.map(selNodes, recordFromTreeNode);
+                    dialogoClonaRegistros(toClone);
+                });
+                subscribeTree(tree);
+                tree.val = function (v) {//.prototype
+                    if (v == null) {
+                        var selNodes = tree.getSelectedNodes(); // lastSelectedNode()
+                        var ret = selNodes.map(recordFromTreeNode);
+                        return ret;
+                        //selNodes.forEach(function (node) {
+                        //    while (node.hasChildren()) {
+                        //        node.getFirstChild().moveTo(node.parent, "child");
+                        //    }
+                        //    node.remove();
+                        //});
+                    } else {
+                        tree.visit(function (node) {
+                            node.setSelected(false);
+                        });
+                        if (Object.prototype.toString.call(v) !== '[object Array]')
+                            v = [v];
+                        $(v).each(function (index, val) {
+                            var key = val.key;
+                            if (key == null)
+                                key = val;
+                            var node = tree.getNodeByKey(key.toString());
+                            if (node != null)
+                                node.setSelected(true);
+                        });
+
+                    }
+                };
+                return fancytree;
+            }
+
+            // Inicia un fancy tree y un formulario copiado de "#panelTree".
+            this.initFancyTreeAndUI = function (parentJName, name) {
+                var cloned = $("#panelTree").clone();
+                cloned.attr("id", name);
+                cloned.appendTo(parentJName);
+                cloned.show();
+
+                return self.initFancyTree($("#" + name).find(".fancytree-instance"));
+            };
+            // $("#myModal").modal();
+            // Initializes a form for creating new registers
+            this.dialogoEditaRegistros = function (form, simple, data) { // var form = $("#formAddRecord");
+                var main = form;
+                self.requestHubInfo(false).done(function (info) {
+                    if (!form.is("form"))
+                        form = form.find("form");
+                    if (!form.is("form"))
+                        return null;
+                    form.empty();
+                    //form.addClass("form-horizontal");
+                    for (var baseClass in info.recordProperties) {
+                        var proplist = info.recordProperties[baseClass];
+                        //if (!baseClass.endsWith("Basic")) {
+                        //    continue;
+                        //}
+                        for (var index = 0; index < proplist.length; ++index) {
+                            var prop = proplist[index]; // Prop es un objeto con varios miembros
+                            var ro = (prop.Attribute.ReadOnlyAttribute == true || "KeyAttribute" in prop.Attribute);
+                            if (data == null && ro) {
+                                continue; // Si se va a crear un nuevo registro, no mostrar valores de sólo lectura
+                            }
+                            var name = prop['Name'];
+                            var type = prop['Type'];
+                            var arr = prop['Array'];
+                            var display = prop.Attribute.DisplayAttribute.Name;
+                            if (display == null)
+                                display = name;
+                            var group = $('<div class="form-group row">').appendTo(form);
+                            if (simple != true) {
+                                group.append('<label for="new' + name + '" class="col-sm-2 form-control-label">' + display + '</label>');
+                                group = $('<div class="col-sm-10">').appendTo(group);
+                            }
+                            var readonly = ro ? 'readonly = "readonly" ' : "";
+                            // Cada etiqueta input para creación de registros tendrá la clase 'add-record' y los datasets type y name
+                            if ("AmbientValueAttribute" in prop.Attribute) {
+                                if (ro == true)
+                                    continue; // No mostrar en el editor selecciones de sólo lectura
+                                var ambient = prop.Attribute.AmbientValueAttribute;
+                                var model = /([^.,]+),/g.exec(ambient[0])[1];
+                                var member = ambient[1];
+                                var selectAppend = "";
+                                var val = null;
+                                if (arr == true)
+                                    selectAppend = " multiple ";
+                                if (data != null) {
+                                    val = data[name];
+                                    if ($.isArray(val)) {
+                                        // El control necesita que los índices sean cadenas de caracteres (no ints)
+                                        val = val.map(function (current, index, array) {
+                                            return current === null ? null : current.toString();
+                                        });
+                                    }
+                                }
+                                var select = group.append('<select id="new' + name + '" class="col-sm-10 form-control ' + model +
+                                    '_select_box chosen-select add-record" data-type="' + type + '" data-name="' + name +
+                                    '" data-placeholder="' + display + '"' + selectAppend + ' ' + readonly + '>').find("select"); // chosen-rtl ui-corner-all creation"
+                                // Rellena el select
+                                function fillSelect(select, viewModel, idName, nameName) {
+                                    this.selectVal = select.val();
+                                    select.empty();
+                                    var self = this;
+                                    //this.nRecords = 0;
+                                    $.each(viewModel.records, function (key, value) {
+                                        if (value._id < 0)
+                                            return;
+                                        var id = value[idName];
+                                        if (self.selectVal == null)
+                                            self.selectVal = id.toString(); // Toma el primer valor del conjunto
+                                        var name = value[nameName];
+                                        //var sel = (self.nRecords++ == 0) ? ' selected = "selected"' : ""; // ' + sel + '
+                                        select.append('<option value="' + id + '">' + name + '</option>');
+                                    });
+                                    if (val != null) {
+                                        this.selectVal = val;
+                                    }
+                                    select.val(this.selectVal).change();
+                                    select.chosen({ disable_search_threshold: 5, width: "100%", no_results_text: "¡No se encuentran elementos!" });
+                                    select.trigger("chosen:updated");
+                                }
+                                //self.fillCallbackEnabled = false;
+                                var viewModel = getViewModel(model);
+                                var fillCallback = function (status, changes) {
+                                    fillSelect(select, viewModel, "_id", "_nombre");
+                                };
+                                fillCallback();
+                                mediator.subscribe(subName, fillCallback);
+                                select.on("remove", function () {
+                                    // Element was removed
+                                    mediator.unsubscribe(subName, fillCallback);
+                                });
+                            } else if (type == "Boolean") {
+                                var input = $('<input id="new' + name + '" class="form-control tristate add-record" type="checkbox" data-type="'
+                                   + type + '" data-name="' + name + '" ' + readonly + '/>').appendTo(group);
+                                if (data != null) {
+                                    var val = data[name];
+                                    if (val != null) {
+                                        input.attr('checked', val);
+                                    } else {
+                                        input.prop("indeterminate", true);
+                                    }
+                                }
+                            } else if (type == "DateTime") {
+                                // https://eonasdan.github.io/bootstrap-datetimepicker/
+                                var input = $('<div class="input-group date" data-name="' + name + '" ' + readonly + '>' +
+                                                '<input id="new' + name + '" type="text" class="form-control add-record" data-name="'
+                                                    + name + '" data-type="' + type + '" ' + readonly + '/>' +
+                                                '<span class="input-group-addon">' +
+                                                    '<span class="glyphicon glyphicon-calendar"></span>' +
+                                                '</span>' +
+                                              '</div>').appendTo(group);
+                                input.datetimepicker({
+                                    locale: 'es',
+                                    format: 'LLLL' // LTS
+                                });
+                                var datetimePicker = input.data("DateTimePicker");
+                                if (data != null) {
+                                    var dt = moment(data[name]); //, "LLLL", "es"
+                                    datetimePicker.date(dt);
+                                }
+                            } else {
+                                var input = $('<input id="new' + name + '" class="form-control ui-corner-all add-record" type="text" data-type="'
+                                    + type + '" data-name="' + name + '" placeholder="¿' + display + '?" ' + readonly + '/>').appendTo(group);
+                                if (data != null) {
+                                    var val = data[name];
+                                    if (val != null) {
+                                        input.val(val);
+                                    } else {
+                                        input.prop("indeterminate", true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    form.append('<br/>');
+                    var footer = $('<div class="modal-footer">').appendTo(form);
+                    $('<button class="btn btn-success btn-primary"><span class="glyphicon glyphicon-ok"></span> Ok</button>') // data-dismiss="modal"
+                        .appendTo(footer).click(function () {
+                            var item = {};
+                            form.find(".add-record").each(function () {
+                                var inputType = this.type;
+                                var type = this.dataset.type;
+                                var name = this.dataset.name;
+                                var value = $(this).val();
+                                /*if (inputType == "select-multiple") {
+                                    value = $(this).val();
+                                } else*/ if (inputType == "checkbox") {
+                                    value = this.indeterminate ? null : this.checked;
+                                } else if (type == "DateTime") {
+                                    //value = (value == "on") ? true : false;
+                                    var dt = moment(value, "LLLL", "es");
+                                    if (!dt.isValid())
+                                        dt = moment(value, moment.ISO_8601); // YYYY-MM-DD[T]HH:mm:ss
+                                    if (dt.isValid())
+                                        value = dt.format("YYYY-MM-DD[T]HH:mm:ss"); //toISOString(); // format(moment.ISO_8601);
+                                    else
+                                        value = null;
+                                }
+                                item[name] = value;
+                            });
+                            if (data != null) {
+                                self.requestUpdateRecord(item, false).done(function () {
+                                    swal({
+                                        title: '¡Actualizado!',
+                                        text: 'El registro ha sido actualizado.',
+                                        type: "success",
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    });
+                                    form.find('.btn-danger').click();
+                                }).fail(function () {
+                                    swal({
+                                        title: 'No Actualizado',
+                                        text: 'El registro no ha podido ser actualizado.',
+                                        type: "error"
+                                    });
+                                });
+                            } else {
+                                self.requestAddRecord(item, false).done(function () {
+                                    swal({
+                                        title: '¡Añadido!',
+                                        text: 'El registro ha sido añadido.',
+                                        type: "success",
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    });
+                                    form.find('.btn-danger').click();
+                                }).fail(function () {
+                                    swal({
+                                        title: 'No Añadido',
+                                        text: 'El registro no ha podido ser añadido.',
+                                        type: "error"
+                                    });
+                                });
+                            }
+                            //form.find(".form-group").empty();
+                            //return false; // Que no se ejecute la acción por defecto
+                        });
+                    $('<button class="btn btn-danger btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancelar</button>')
+                        .appendTo(footer).click(function () {
+                            form.find(".form-group").empty();
+                        });
+                });
+
+                // Captura la función submit del formulario
+                form.submit(function (ev) {
+                    //var item = {};
+                    //form.find(".add-record").each(function () {
+                    //    //var type = this.dataset.type;
+                    //    item[this.dataset.name] = this.value;
+                    //});
+                    //self.requestAddRecord(item);
+                    return false; // Que no se ejecute la acción por defecto
+                });
+            }
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // Handlers for our Hub callbacks
+
+            // El servidor nos manda una página de registros (Returned data - http://datatables.net/manual/server-side)
+            // filtered: Objeto que contiene los miembros filtered.filteredRecords = []; filtered.queryToken = "";
+            this.recordRange = function (resultHub, filtered) {
+                // resultHub.name;
+                // resultHub.queryToken;
+                // resultHub.start;
+                // resultHub.draw;
+                // resultHub.recordsTotal;
+                // resultHub.recordsFiltered;
+                // resultHub.data;
+                var start = resultHub.start;
+                // Comprueba si los filtros de búsqueda han cambiado respecto a la vez anterior
+                if (filtered != null) {
+                    var queryTokenString = JSON.stringify(resultHub.queryToken).toLowerCase();
+                    var filteredTokenString = JSON.stringify(filtered.queryToken).toLowerCase();
+                    if (filteredTokenString != queryTokenString) {
+                        var recordsTotal = Math.max(resultHub.recordsTotal, resultHub.start + resultHub.data.length);
+                        filtered.filteredRecords.length = 0;
+                        filtered.filteredRecords.length = recordsTotal; // Crece el array. Necesario para el cálculo de la longitud de records de queryToken
+                        filtered.queryToken = resultHub.queryToken;
+                    }
+                }
+                bNotifyServer = false;
+                // Actualiza el array con los valores recibidos de la Base de Datos
+                for (var i = 0; i < resultHub.data.length; ++i) {
+                    // TODO: Usar addRecords()
+                    var item = resultHub.data[i];
+                    var Id = getId(item);
+                    if (self.records[Id] != null) {
+                        self.records[Id].copyFrom(item); // Si no existe, sobreescribe miembro a miembro // djg: comprobar si son diferentes antes de machacarlo
+                    } else {
+                        var rec = new self.recordViewModel(item);
+                        self.records[Id] = rec;
+                    }
+                    if (filtered != null) {
+                        filtered.filteredRecords[resultHub.start + i] = self.records[Id];
+                    }
+                }
+                bNotifyServer = true;
+                mediator.timepublish(subName, 'load', { value: resultHub.data });
+            }
+
+            this.RecordsHub.client.recordRange = this.recordRange;
+
+            // El servidor notifica que hay registros que han cambiado.
+            this.RecordsHub.client.recordsChanged = function (modelName, change, ids) {
+                if (modelName == self.viewModelName) { // El mensaje es para este modelo
+                    consoleLog('recordsChanged(' + modelName + ', ' + change + '): ' + JSON.stringify(ids));
+                    if (change == "change" || change == "update" || change == "add" || change == "clone")
+                        self.addRecordsById(ids);
+                    else if (change == "delete")
+                        self.removeRecordsById(ids);
+                } else {
+                    //consoleLog('Foreigner Updated (' + modelName + '): ' + JSON.stringify(ids));
+                    var vm = getViewModel(modelName);
+                    if (vm != null) {
+                        self.foreignerUpdatedTimer = setTimeout(function () {
+                            vm.RecordsHub.client.recordsChanged(modelName, change, ids);
+                        }, 250);
+                    }
+                }
+            };
+
+            // El servidor notifica que se ha actualizado un registro.
+            this.RecordsHub.client.recordUpdated = function (id) {
+                return self.addRecordsById([id]);
+            };
+            this.RecordsHub.client.recordsUpdated = function (ids) {
+                return self.addRecordsById(ids);
+            };
+
+            // El servidor notifica que un registro ha sido añadido a la tabla.
+            this.RecordsHub.client.recordAdded = function (id) {
+                return self.addRecordsById([id]);
+            };
+
+            // El servidor notifica que unos registros han sido modificados o recién añadidos a la tabla.
+            // Argumento: Lista de ids
+            this.RecordsHub.client.recordsAdded = self.addRecordsById;
+            
+            // El servidor notifica que un registro ha sido eliminado de la tabla.
+            /// Argumento: Array de identificadores para borrar
+            this.RecordsHub.client.recordsDeleted = self.removeRecordsById;
+
+            // El servidor notifica que ha ocurrdo un error.
+            this.RecordsHub.client.reportError = function (error) {
+                consoleLog(error);
+                notify({ title: "Error de Base de Datos", text: error, type: "error" });
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // View Model 'Commands'
+
+            // Pide registros tal como indica la estructura data de tipo Datatable (DTParameters) http://datatables.net/manual/server-side
+            // Si se usa data=null, pide todos los registros: self.requestRecords();
+            this.requestRecords = function (data) {
+                var deferred = $.Deferred();
+                self.RecordsHub.server.getRecords(data).done(function (res) {
+                    consoleLog('Respuesta del servidor getRecords(' + JSON.stringify(data) + '): ' /*+ JSON.stringify(res)*/);
+                    deferred.resolve(res);
+                }).fail(function (e) {
+                    console.warn("Rechazado por el servidor getRecords(" + JSON.stringify(data) + "): \nError: " + e);
+                    deferred.reject(e);
+                });
+                return deferred.promise();
+            }
+
+            // Hace una petición de lectura de registros
+            // displayStart: Offset del primer registro a leer
+            // displayLength: Cantidad de registros a leer
+            // sSearch: Cadena de búsqueda (filtro)
+            // bRegex: Indica si es una expresión regular
+            this.requestRecordData = function (displayStart, displayLength, sSearch, bRegex) { // sSearch = null, bRegex = false
+                var d = {
+                    draw: 0,
+                    columns: [],
+                    order: [],
+                    start: displayStart,
+                    length: displayLength,
+                    search: {
+                        value: sSearch,
+                        regex: bRegex
+                    }
+                };
+                return self.requestRecords(d).done(function (result) {
+                    self.recordRange(result);
+                }).fail(function () {       
+                    consoleLog('requestRecords(' + JSON.stringify(d) + '): Fallo');
+                });
+            }
+
+            // To delete a record array
+            this.requestDeleteRecords = function (ids, bNotify) {
+                var deferred = $.Deferred();
+                self.RecordsHub.server.delete(ids).done(function (res) {
+                    consoleLog('Respuesta del servidor Delete(' + JSON.stringify(ids) + '): ' + res);
+                    (res == true) ? deferred.resolve() : deferred.reject();
+                    if (bNotify) {
+                        if (res == true)
+                            notify({ title: "Borrado", text: "El registro ha sido borrado del servidor.", type: "success" });
+                        else
+                            notify({ title: "No Borrado", text: "El registro no ha podido ser borrado del servidor.", type: "error" });
+                    }
+                }).fail(function (e) {
+                    console.warn('Rechazado por el servidor Delete(' + JSON.stringify(ids) + "): \n" + e);
+                    deferred.reject();
+                    if (bNotify)
+                        notify({ title: "No Borrado", text: "El registro no ha podido ser borrado del servidor:<br/>" + e, type: "error" });
+                }); // El servidor llamará a self.RecordsHub.client.recordsDeleted(ids)
+                return deferred.promise();
+            }
+
+            // To clone a record array
+            this.requestCloneRecords = function (ids, bNotify) {
+                var deferred = $.Deferred();
+                self.RecordsHub.server.clone(ids).done(function (res) {
+                    consoleLog('Respuesta del servidor Clone(): ' + res + "\nRecord Ids: " + JSON.stringify(ids));
+                    (res == true) ? deferred.resolve() : deferred.reject();
+                    if (bNotify) {
+                        if (res == true)
+                            notify({ title: "Clonado", text: "El registro ha sido clonado en el servidor.", type: "success" });
+                        else
+                            notify({ title: "No Clonado", text: "El registro no ha podido ser clonado en el servidor.", type: "error" });
+                    }
+                }).fail(function (e) {
+                    console.warn('Rechazado por el servidor Clone(' + JSON.stringify(ids) + ")\n" + e);
+                    deferred.reject();
+                    if (bNotify)
+                        notify({ title: "No Clonado", text: "El registro no ha podido ser clonado en el servidor:<br/>" + e, type: "error" });
+                });
+                return deferred.promise();
+            }
+
+            // To update the record
+            this.requestUpdateRecord = function (record, bNotify) {
+                var deferred = $.Deferred();
+                if (bNotifyServer) {
+                    self.RecordsHub.server.update(record).done(function (res) {
+                        consoleLog('Respuesta del servidor Update(): ' + res + "\nRecord:\n" + JSON.stringify(record));
+                        (res == true) ? deferred.resolve() : deferred.reject();
+                        if (bNotify) {
+                            if (res == true)
+                                notify({ title: "Actualizado", text: "El registro ha sido actualizado en el servidor.", type: "success" });
+                            else
+                                notify({ title: "No Actualizado", text: "El registro no ha podido ser actualizado en el servidor.", type: "error" });
+                        }
+                    }).fail(function (e) {
+                        console.warn('Rechazado por el servidor Update(): ' + JSON.stringify(record) + "\n" + e);
+                        deferred.reject();
+                        if (bNotify)
+                            notify({ title: "No Actualizado", text: "El registro no ha podido ser actualizado en el servidor:<br/>" + e, type: "error" });
+                    });
+                }
+                return deferred.promise();
+            }
+
+            // To add the record
+            this.requestAddRecord = function (record, bNotify) {
+                var deferred = $.Deferred();
+                var rec = new self.recordViewModel(record);
+                rec._id = -1;
+                self.RecordsHub.server.add(rec).done(function (res) {
+                    consoleLog('Respuesta del servidor Add(): ' + res + "\nRecord:\n" + JSON.stringify(record));
+                    (res == true) ? deferred.resolve() : deferred.reject();
+                    if (bNotify) {
+                        if (res == true)
+                            notify({ title: "Añadido", text: "El registro ha sido añadido en el servidor.", type: "success" });
+                        else
+                            notify({ title: "No Añadido", text: "El registro no ha podido ser añadido en el servidor.", type: "error" });
+                    }
+                }).fail(function (e) {
+                    notify({ title: "Borrado", text: "El registro no ha podido ser borrado del servidor.", type: "error" });
+                    console.warn('Rechazado por el servidor Add(): ' + JSON.stringify(record) + "\n" + e);
+                    deferred.reject();
+                    if (bNotify)
+                        notify({ title: "No Añadido", text: "El registro no ha podido ser añadido en el servidor:<br/>" + e, type: "error" });
+                });
+                return deferred.promise();
+            }
+
+            // To add the record
+            this.requestHubInfo = function (bForceReload) {
+                var deferred = $.Deferred();
+                if (self.hubInfo == null || bForceReload === true) {
+                    self.RecordsHub.server.getInfo().done(function (info) {
+                        self.setHubInfo(info);
+                        consoleLog('Respuesta del servidor HubInfo(): ' + JSON.stringify(info));
+                        deferred.resolve(info);
+                    }).fail(function (e) {
+                        console.warn("Rechazado por el servidor HubInfo()\nError: " + e);
+                        deferred.reject();
+                    });
+                }
+                else {
+                    deferred.resolve(self.hubInfo);
+                }
+                return deferred.promise();
+            }
+        }
+
+        $(function () { //shorthand document.ready function
+            http://blog.apterainc.com/bid/313071/Turn-your-ASP-NET-MVC-app-into-a-Single-Page-Application-with-one-classy-Sammy-js-route
+            var routing = new Routing('@Url.Content("~/")', '#page', 'Home/Tabs');
+            routing.init();
+
+            /// https://github.com/mar10/fancytree/wiki/ExtDnd#howto-accept-standard-jquery-ui-draggables-as-drop-source
+            $(".draggable").draggable({
+                revert: true, //"invalid",
+                cursorAt: { top: -5, left: -5 },
+                connectToFancytree: true,    // let Fancytree accept drag events
+            });
+        })
+        function connectHub() {
+            var deferred = $.Deferred();
+            $.connection.hub.connectionSlow(function () {
+                console.log('Se están experimentando dificultades con la conexión de SignalR.')
+            });
+            $.connection.hub.error(function (error) {
+                console.log('Error de SignalR: ' + error);
+                notify({ title: "Error de conexión con el servidor", text: error, type: "error" });
+            });
+            $.connection.hub.disconnected(function () {
+                console.log('Error de SignalR: Desconectado')
+                notify({ title: "Desconectado del servidor", text: "Reintentando la conexión", type: "error" });
+                //self.RecordsHub.client.reportError('Desconectado de SignalR');
+                setTimeout(function () {
+                    $.connection.hub.start();
+                }, 4000); // Reintenta la conexión pasados 4 segundos.
+                deferred.resolve();
+            });
+            // Start (or Restart) the connection
+            $.connection.hub.start(function () {
+                console.log('Conectado a SignalR');
+                notify({ title: "Conectado al servidor", text: "Sincronización activada", type: "notice" });
+                deferred.resolve();
+            });
+            return deferred.promise();
+        }
+    </script>
+    
+    <!-- Custom Theme JavaScript -->
+    <script src="@Url.Content("~/bower_components/metisMenu/src/metisMenu.js")"></script>
+    <script src="@Url.Content("~/Scripts/sb-admin-2.js")"></script>
+
+    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    @RenderSection("scripts", required: false)
+    <script>
+        jQuery(function ($) {
+            // Modifica el parser del validador de fechas por defecto de jQuery para admitir fechas del tipo "2015-12-24 09:32:21"
+            var val = $.validator;
+            if (val != null) {
+                val.addMethod('date',
+                function (value, element) {
+                    var ok = this.optional(element) || /^((\d{4}-\d{2}-\d{2})( \d{2}:\d{2}:\d{2})?)$/.test(value);
+                    return ok;
+                });
+            }
+        });
+    </script>
+    <div id="panelTree" class="panel panel-default" style="display: none;">
+        <div class="panel-heading">
+            <b>Estados</b>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group">
+                    <button class="btn btn-default buttons-select-all boton-crear" type="button">
+                        <em class="glyphicon glyphicon-plus"></em> <span class="hidden-sm"><span class="hidden-xs">Crear</span></span>
+                    </button>
+                    <button class="btn btn-default buttons-select-all boton-todo" type="button">
+                        <em class="fa fa-list-ul"></em> <span class="hidden-sm"><span class="hidden-xs">Todo</span></span>
+                    </button>
+                    <button class="btn btn-default buttons-select-none boton-nada disabled" type="button">
+                        <em class="fa fa-bars"></em> <span class="hidden-sm"><span class="hidden-xs">Nada</span></span>
+                    </button>
+                    <button class="btn btn-default buttons-select-none boton-borrar disabled" type="button">
+                        <em class="glyphicon glyphicon-erase"></em> <span class="hidden-sm"><span class="hidden-xs boton-borrar-span">Borrar</span></span>
+                    </button>
+                    <button class="btn btn-default buttons-select-none boton-clonar disabled" type="button">
+                        <em class="glyphicon glyphicon-duplicate"></em> <span class="hidden-sm"><span class="hidden-xs boton-clonar-span">Clonar</span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="fancytree-instance"></div>
+        <div class="panel-footer">
+            <button class="btn btn-xs btn-primary tree-expander">Expande todo</button>
+            <button class="btn btn-xs btn-warning tree-collapser">Contrae todo</button>
+        </div>
+    </div>
+</body>
+</html>
+

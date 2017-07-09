@@ -1,0 +1,55 @@
+﻿@model IEnumerable<WebGestion.Models.Familias>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+</style>
+<h2>Index</h2>
+<h4>Familias</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.CodFamilia)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Familia)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Estados.Nombre)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Familias2.CodFamilia)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CodFamilia)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Familia)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Estados.Nombre)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Familias2.CodFamilia)
+        </td>
+
+    </tr>
+}
+
+</table>

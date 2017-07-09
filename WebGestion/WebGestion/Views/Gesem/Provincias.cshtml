@@ -1,0 +1,12 @@
+﻿@using WebGestion.App_Start
+@{
+    var table = Html.MvcTable(() => new ProvinciasTable());
+}
+<section id="Result" class="spy-on-me">
+    <h4>Result</h4>
+    @table.PageSizer()
+    @table.Pagination()
+    @table.Table()
+    @table.Pagination()
+    @table.PageSizer()
+</section>

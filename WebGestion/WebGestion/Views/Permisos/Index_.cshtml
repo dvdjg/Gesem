@@ -1,0 +1,107 @@
+﻿@model IEnumerable<WebGestion.Models.Permisos>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    td:nth-child(1n) {
+        text-align: left;
+    }
+
+    td:nth-child(4n) {
+        text-align: right;
+    }
+</style>
+
+<div class="page-header">
+    <h2>Permisos <small>de Usuarios del sistema</small></h2>
+</div>
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li class="active">Permisos</li>
+</ol>
+
+<p>
+    @Html.ActionLink("Crea un nuevo Permiso", "Create")
+</p>
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Permiso)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaAlta)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaBaja)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estados.Estado)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.Permiso, "Edit", new { id = item.Id }) <br /><small>@Html.DisplayFor(modelItem => item.Descripcion)</small>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FechaAlta.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FechaBaja)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Estados.Estado)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Permiso)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaAlta)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaBaja)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estados.Estado)
+            </th>
+        </tr>
+    </tfoot>
+</table>
+
+@section scripts{
+    <script type="text/javascript" language="javascript" src="@Url.Content("~/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.js")"></script>
+    <script type="text/javascript" language="javascript" src="@Url.Content("~/bower_components/datatables-pluginsdatatables/media/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.table').dataTable({
+            @*"processing": true,
+            "serverSide": true,
+            "info": true,
+            "stateSave": true,
+            "lengthMenu": [[10, 20, 50, -1], [10, 20, 50, "All"]],
+            "ajax":{
+                "url": "@string.Format("{0}://{1}{2}", Request.Url.Scheme, Request.Url.Authority, Url.Content("~"))/Permisos/AjaxGetJsonData",
+                "type": "GET"
+            },
+            "columns": [
+                { "data": @Html.DisplayNameFor(model => model.Permiso), "orderable" : true },
+                { "data": @Html.DisplayNameFor(model => model.FechaAlta), "orderable": true },
+                { "data": @Html.DisplayNameFor(model => model.FechaBaja), "orderable": true },
+                { "data": @Html.DisplayNameFor(model => model.Estados.Estado), "orderable": true }
+            ],
+            "order": [[0, "asc"]]*@
+        });
+    });
+    </script>
+    }

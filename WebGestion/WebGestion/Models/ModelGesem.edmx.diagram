@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="80056358294c418aae59a8b5fa65d628" Name="Diagram1" ZoomLevel="23">
+        <EntityTypeShape EntityType="GesemModel.ApplicationGroups" Width="1.5" PointX="3.75" PointY="36.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.AspNetRoles" Width="1.5" PointX="6" PointY="40.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.AspNetUserClaims" Width="1.5" PointX="13.5" PointY="38.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.AspNetUserLogins" Width="1.5" PointX="13.5" PointY="41.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.AspNetUsers" Width="1.5" PointX="11.25" PointY="39.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Bienes" Width="1.5" PointX="5.25" PointY="50.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.BienesCompuestos" Width="1.5" PointX="7.5" PointY="52.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.CambiosLog" Width="1.5" PointX="13.5" PointY="43.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Cargos" Width="1.5" PointX="3" PointY="39.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Clientes" Width="1.5" PointX="18.75" PointY="40.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Cualidades" Width="1.5" PointX="7.5" PointY="49.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.DireccionesFacturacion" Width="1.5" PointX="24" PointY="39.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Empleados" Width="1.5" PointX="21.75" PointY="39.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Empresas" Width="1.5" PointX="3" PointY="42.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Estados" Width="1.5" PointX="0.75" PointY="38.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.FacturasClientes" Width="1.5" PointX="24" PointY="49.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.FacturasProveedores" Width="1.5" PointX="5.25" PointY="46" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Familias" Width="1.5" PointX="3" PointY="50.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.FormasEntrega" Width="1.5" PointX="3" PointY="54.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.FormasPago" Width="1.5" PointX="3" PointY="58" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Historicos" Width="1.5" PointX="29.25" PointY="45" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Idiomas" Width="1.5" PointX="14.25" PointY="34.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Inventario" Width="1.5" PointX="27" PointY="46.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.IRPFs" Width="1.5" PointX="3" PointY="61.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.IVAs" Width="1.5" PointX="3" PointY="64.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Locales" Width="1.5" PointX="8.25" PointY="39.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Localidades" Width="1.5" PointX="14.25" PointY="29.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Paises" Width="1.5" PointX="9.75" PointY="29.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PedidosClientes" Width="1.5" PointX="13.5" PointY="47.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PedidosProveedores" Width="1.5" PointX="31.5" PointY="41.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PedidosProveedoresDetalle" Width="1.5" PointX="33.75" PointY="53.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Personas" Width="1.5" PointX="16.5" PointY="39.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PresupuestosClientes" Width="1.5" PointX="21" PointY="35.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PresupuestosClientesDetalle" Width="1.5" PointX="26.5" PointY="50.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.PresupuestosClientesDetalleAgrupados" Width="1.5" PointX="23.25" PointY="36" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Proveedores" Width="1.5" PointX="18.75" PointY="36.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Provincias" Width="1.5" PointX="12" PointY="29.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.Recursos" Width="1.5" PointX="31.5" PointY="45.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.TiposDeCualidades" Width="1.5" PointX="5.25" PointY="57.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.TiposFacturas" Width="1.5" PointX="21.75" PointY="50.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="GesemModel.TiposPropiedades" Width="1.5" PointX="27" PointY="42.875" IsExpanded="true" />
+        <AssociationConnector Association="GesemModel.FK_AspNetRoles_Estados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_AspNetUsers_Estados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosClientes_Usuario_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Personas_AspNetUsers" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PresupuestosClientes_Usuario_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Usuario_Cambios_Log" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Articulos_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Articulos_Familias_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Articulos_IVA_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_ArticulosCompuestos_Articulos" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_ArticulosCompuestos_Articulos1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Inventario_Bienes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosProveedoresDetalle_Articulos_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PresupuestosClientesDetalle_Articulos_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Cargos_Estados_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Clientes_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Clientes_Personas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_DirccionFacturacion_Clientes_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PresupuestosClientes_Clientes_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Cualidades_TiposDeCualidades" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_DirccionFacturacion_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_DirccionFacturacion_Municipios_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_DireccionesFacturacion_Idiomas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Empleados_Coordinador" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Empleados_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Empleados_Local_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Empleados_Personas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasClientes_Empleados_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Inventario_Empleados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Delegacion_Empresas_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Empresas_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasClientes_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasProveedores_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Familias_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FormasEntrega_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FormasPago_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Historicos_Estados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_IRPF_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_IVA_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Local_Estado" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosClientes_EstadoId_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosProveedores_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Personas_Estado" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PresupuestosClientes_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Proveedores_Estado_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Recursos_Estados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fkey0" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasClientes_IRPF_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasClientes_TipoFactura_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasProveedores_FormasEntrega_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasProveedores_Pago_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_FacturasProveedores_TipoFactura_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Familias_Familias" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosClientes_FormasEntrega_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosClientes_FormasPago_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Historicos_TiposPropiedades" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Locales_Idiomas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Localidades_Idioma" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Municipios_Idiomas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Paises_Idiomas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Personas_Idioma" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_LocalizacionArticulos_Locales_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosProveedoresDetalle_IVA_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PresupuestosClientesDetalle_IVA_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Delegacion_Localidad_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Localidades_Provincias" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Personas_Localidad_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_Provincias_Paises1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosClientes_PresupuestosClientes_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosProveedores_Proveedores_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_PedidosProveedoresDetalle_PedidosProveedores_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_Proveedores_Persona" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_PresupuestosClientesDetalleAgrupados_PresupuestosClientes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.FK_PresupuestosClientesDetalle_PresupuestosClientesDetalleAgrupados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.fk_TipoPropiedad_TipoPropiedad_1" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.ApplicationGroupRoles" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.ApplicationUserGroups" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.AspNetUserRoles" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.CargosDeEmpleados" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.CualidadesDeBienes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosBienes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosFacturasClientes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosFacturasProveedores" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosFamilias" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosPedidosClientes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosPedidosProveedores" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosPersonas" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosPresupuestosClientes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.HistoricosRecursos" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.PedidosCombinadosClientes" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.PedidosCombinadosProveedores" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.RecursosInventario" ManuallyRouted="false" />
+        <AssociationConnector Association="GesemModel.RecursosPersonas" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

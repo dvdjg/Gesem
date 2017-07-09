@@ -1,0 +1,64 @@
+﻿@model IEnumerable<WebGestion.Models.PresupuestosClientesDetalle>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+
+
+
+</style>
+<h2>Index</h2>
+<h4>PresupuestosClientesDetalle</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cantidad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Precio)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Articulos.CodArticulo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IVAs.Descripcion)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PresupuestosClientesDetalleAgrupados.Descripcion)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Cantidad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Precio)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Articulos.CodArticulo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IVAs.Descripcion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PresupuestosClientesDetalleAgrupados.Descripcion)
+        </td>
+
+    </tr>
+}
+
+</table>

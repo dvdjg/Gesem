@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@section Scripts
+{
+    <script src="~/signalr/hubs" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            //View Models
+
+            //Record List View Model
+            function recordListViewModel() {
+
+                //Handlers for our Hub callbacks
+
+                this.hub = $.connection.PaisesHub;
+                //$.connection.hub.logging = true;
+                $.connection.hub.connectionSlow(function () {
+                    console.log('Se están experimentando dificultades con la conexión.')
+                });
+                $.connection.hub.error(function (error) {
+                    console.log('Error de SignalR: ' + error)
+                });
+
+                this.records = [];
+                this.newRecordName = "";
+                this.newRecordDesc = "";
+
+                var records = this.records;
+                var self = this;
+                var notify = true;
+
+                //Initializes the view model
+                this.init = function () {
+                    // Pide al servidor que envíe todos los registros
+                    this.hub.server.getAll();
+                }
+
+                //Handlers for our Hub callbacks
+
+                // El servidor envía todos los registros de una tabla.
+                this.hub.client.recordAll = function (allRecords) {
+
+                    var mappedRecords = $.map(allRecords, function (item) {
+                        return new recordViewModel(item.Id, item.Nombre, item.Descripcion, self)
+                    });
+
+                    records(mappedRecords);
+                }
+
+                // El servidor notifica que se ha actualizado un registro.
+                this.hub.client.recordUpdated = function (t) {
+                    var record = records.findFirst(function (value) {
+                        return value.Id == t.Id;
+                    });
+                    notify = false;
+                    record.Nombre(t.Nombre);
+                    record.Descripcion(t.Descripcion);
+                    notify = true;
+                };
+
+                // El servidor notifica que ha ocurrdo un error.
+                this.hub.client.reportError = function (error) {
+                    $("#error").html(error);
+                    $("#error").fadeIn(1000, function () {
+                        $("#error").fadeOut(30000);
+                    });
+                }
+
+                // El servidor notifica que un registro ha sido añadido a la tabla.
+                this.hub.client.recordAdded = function (t) {
+                    records.push(new recordViewModel(t.Id, t.Nombre, t.Descripcion, self));
+                };
+
+                // El servidor notifica que un registro ha sido eliminado de la tabla.
+                this.hub.client.recordRemoved = function (id) {
+                     var record = records.findFirst(function (value) {
+                        return value.Id == id;
+                    });
+                    records.remove(record);
+                };
+
+                //View Model 'Commands'
+
+                //To create a record
+                this.addRecord = function () {
+                    var t = {
+                        "Nombre": this.newRecordName(),
+                        "Descripcion": this.newRecordDesc()
+                    };
+                    this.hub.server.add(t).done(function () {
+                        console.log('Success!')
+                    }).fail(function (e) {
+                        console.warn(e);
+                    });
+
+                    //this.newRecordName("");
+                }
+
+                //To remove a record
+                this.removeRecord = function (id) {
+                    this.hub.server.remove(id);
+                }
+
+                //To update this record
+                this.requestUpdateRecord = function (record) {
+                    if (notify)
+                        this.hub.server.update(record);
+                }
+
+                //Gets the incomplete records
+                //this.descRecords = ko.dependentObservable(function () {
+                //    return this.records.filter(function (record) { return record.Descripcion() != null });
+                //}, this);
+
+            }
+
+            var vm = new recordListViewModel();
+            //ko.applyBindings(vm);
+            // Start the connection
+            $.connection.hub.start(function () { vm.init(); });
+
+        });
+
+
+    </script>
+}
+<div id="error" class="validation-summary-errors">
+</div>
+<h2> Add Record</h2>
+<form data-bind="submit: addRecord">
+    <input data-bind="value: newRecordName" class="ui-corner-all" placeholder="done?" />
+    <input data-bind="value: newRecordDesc" class="ui-corner-all" placeholder="done? Brief" />
+    <input class="ui-button" type="submit" value="Add Record" />
+    <h2>Our Records</h2>
+    <br />
+    Tiene <b data-bind="text: descRecords().length">&nbsp;</b> regsitros con descripción
+    <ul data-bind="template: { name: 'recordTemplate', foreach: records }, visible: records.length > 0"></ul>
+    <script type="text/html" id="recordTemplate">
+        <li style="list-style-image: url('/Content/images/task.png')">
+            @*<input type="checkbox" data-bind="checked: completed" />
+                <input class="ui-corner-all" data-bind="value: title, enable: !completed()" />*@
+            <input class="ui-corner-all" data-bind="value: Nombre" />
+            <input class="ui-corner-all" data-bind="value: Descripcion" />
+            <input class="ui-button" type="button" href="#" data-bind="click: remove" value="x" />
+        </li>
+    </script>
+    <span data-bind="visible: descRecords().length == 0">
+        All records aaa
+    </span>
+</form>
+

@@ -1,0 +1,160 @@
+﻿@{
+    ViewBag.Title = "Tabs";
+}
+<script>
+
+    $(function () {
+        var mediator = new Mediator();
+        var connectCount = 0;
+        var g_bConnected = false;
+
+        // https://github.com/JayrAlencar/bootstrap-dynamic-tabs
+        var tabs = $('#tabs').bootstrapDynamicTabs();
+
+        function processAction(link, postData) {
+            console.log('processAction('+ link +'): ' + JSON.stringify(postData));
+            if (link == null)
+                return false;
+            if (link.match("^javascript:") || link == "#")
+                return true;
+            if (link.match("^/$|LogOff")) { // Que se procese la recarga total de la página (Por ejemplo cuando se loguea)
+                console.log('location.reload()');
+                window.location = "/";
+                //location.reload();
+                return false;
+            }
+            var actionRX = /\/([^\/]+)(\/([^\/]+))?/g.exec(link);
+            if (actionRX != null) { 
+                var action = actionRX[3];
+                if (action == null)
+                    action = "Index";
+                var image = $(this).find('i').attr("class");
+
+                function onResponse(response) {
+                    console.log('onResponse: ' + JSON.stringify(response));
+                    if (response !== null && typeof response === 'object' && response.success == true) {
+                        if (response.redirecturl != null) {
+                            console.log('redirecturl: ' + JSON.stringify(response.redirecturl));
+                            return processAction(response.redirecturl);
+                            // $.get(response.redirecturl, onResponse);
+                        }
+                        return true;
+                    }
+                    if (action == "Index")
+                        action = actionRX[1];
+                    idTab = action.toLowerCase();
+                    tabs.addTab({
+                        id: idTab,
+                        title: action,
+                        html: response,
+                        icon: image,
+                        setClass: "fade in" // "animated fadeInRight"
+                    });
+                    $('#' + idTab).on("remove", function () {
+                        // Element was removed
+                        notify({ title: "TAB", text: "Borrada pestaña " + idTab, type: "info" });
+                        var vm = g_viewModels[idTab];
+                        vm.clear();
+                    });
+                    $('#' + idTab + ' a').click(function (e) {
+                        var href = $(e.currentTarget).attr("href");
+                        tabs.closeById(idTab);
+                        return processAction(href);
+                    });
+                    Waves.attach('#' + idTab + '.button, #' + idTab + '.btn', ['waves-float']);
+                    
+                    $('#' + idTab + ' form').submit(function (event) {
+                        var form = this;
+                        var action = form.getAttribute('action');
+                        tabs.closeById(idTab);
+                        var data = $(form).serialize();
+                        return processAction(action, data); // Que no se ejecute la acción por defecto
+                    });
+                }
+                if (postData == null) {
+                    $.get(link, onResponse);
+                    console.log("get: " + link);
+                } else {
+                    $.post(link, postData, onResponse);
+                    console.log("post: " + link + "\ndata: " + JSON.stringify(postData));
+                }
+                return false;
+            }
+            console.log('Link no procesado');
+            return false;
+        }
+        // Carga explícitamente la página principal
+        $.get('@Url.Action("Principal", "Home")').done(function (theHtmlReturned) {
+            tabs.addTab({
+                title: 'Principal',
+                html: theHtmlReturned,
+                closable: false,
+                setClass: "fade in"
+            });
+        });
+
+        // Crea instancias de todos los hubs accesibles desde el panel de navegacion lateral
+        // para que puedan generarse los proxies de SignalR
+        $("#side-menu a").each(function (index, a) {
+            var href = this.href;
+            var action = /\/Hub\/([^\/]+)/g.exec(href);
+            if (action != null) {
+                var act = action[1];
+                var vm = getViewModel(act); // Registra en g_viewModels
+            }
+        });
+
+        // Antes de conectarse al hub, todas las funciones del cliente deben estar registradas
+        // para que se genere el proxy correspondiente
+        connectHub().done(function () {
+            ++connectCount;
+            g_bConnected = true;
+            $.each(g_viewModels, function (key, vm) {
+                console.log('connectHub(' + key + ')');
+                vm.requestHubInfo(false).done(function (info) {
+                    // Cuando tenga la información del tipo de datos, lee los datos
+                    vm.requestRecordData(0, 500, null, false);
+                });
+            });
+        }).fail(function () {
+            g_bConnected = false;
+        });
+        function formSubmit(event) {
+            console.log('formSubmit('+event+')');
+            var form = this;
+            var action = form.getAttribute('action');
+            //tabs.closeById(idTab);
+            var jform = $(form);
+            var data = jform.serialize();
+            //var paramObj = {};
+            //$.each(jform.serializeArray(), function (_, kv) {
+            //    if (paramObj.hasOwnProperty(kv.name)) {
+            //        paramObj[kv.name] = $.makeArray(paramObj[kv.name]);
+            //        paramObj[kv.name].push(kv.value);
+            //    }
+            //    else {
+            //        paramObj[kv.name] = kv.value;
+            //    }
+            //});
+            return processAction(action, data); // Que no se ejecute la acción por defecto
+        }
+        // Si el enlace contiene la cadena "/Hub/" cargarla como una vista parcial
+
+        $("a").click(function (e) {
+            var href = $(e.currentTarget).attr("href");
+            return processAction(href);
+        });
+        $('form').submit(formSubmit);
+        // http://fian.my.id/Waves/#start
+        Waves.attach('.button, .btn', ['waves-float']); // 'waves-button',
+        Waves.init();
+    })
+</script>
+
+<div id="tabs"></div>
+
+@*@Html.ActionLink("Click here to Estados", "Estados", "Hub")*@
+<div id="main-content-wrapper" class="partial">
+    @*@Html.Partial("~/Views/Hub/Estados.cshtml")*@
+</div>
+<p>

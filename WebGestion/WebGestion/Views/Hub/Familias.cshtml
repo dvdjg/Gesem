@@ -1,0 +1,31 @@
+﻿<div class="Familias">
+    <h2>Familias</h2>
+    <div class="datatable"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panelForTree"></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="fancytree-container fancytree-radio fancytree-selector"></div>
+            <div class="panel-footer">
+                <button class="btn btn-xs tree-expander">Expande todo</button>
+                <button class="btn btn-xs tree-collapser">Contrae todo</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var connectCount = 0;
+    $(function () { //shorthand document.ready function
+        var vm = getViewModel("Familias");//
+        // Si no se tiene datatable, llamada para coger records: vm.requestRecordData(0, 200, null, false);
+        vm.initDatatable($('div.Familias div.datatable'), { filteredRecords: [], queryToken: "" });
+        vm.initFancyTreeAndUI("div.Familias div.panelForTree", "panelTreeFamilias");
+    });
+
+</script>

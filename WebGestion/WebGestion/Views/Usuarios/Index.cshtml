@@ -1,0 +1,79 @@
+﻿@model IEnumerable<WebGestion.Models.Usuarios>
+
+@{
+    ViewBag.Title = "Index";
+}
+<style type='text/css'>
+    
+
+
+
+</style>
+<h2>Index</h2>
+<h4>Usuarios</h4>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Usuario)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Password)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EstadoId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FechaAlta)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FechaBaja)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Clientes.Id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Empleados.CodEmpleado)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Personas.Nombre)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Usuario)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Password)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EstadoId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FechaAlta)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FechaBaja)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Clientes.Id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Empleados.CodEmpleado)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Personas.Nombre)
+        </td>
+
+    </tr>
+}
+
+</table>
